@@ -2,8 +2,9 @@ using AutoMapper;
 using Database;
 using Domain.Entities;
 using Domain.Interfaces;
-using LibraryManager.Mapper;
+using LibraryManager.Mappers;
 using Manager;
+using Manager.Mappers;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -34,7 +35,8 @@ namespace LibraryManager
             services.AddDbContext<LibraryManagerDBContext>(options =>
             options.UseSqlServer(Configuration.GetConnectionString("DataBaseConnection")));
 
-            services.AddScoped<IEmployeeRepo,EmployeeManager>();
+            services.AddScoped<IEmployeeManager,EmployeeManager>();
+
 
             services.AddIdentity<Employee, IdentityRole>(config =>
             {
@@ -43,7 +45,7 @@ namespace LibraryManager
                 config.Password.RequireLowercase = false;
                 config.Password.RequireUppercase = true;
                 config.Password.RequireDigit = false;
-                config.Password.RequiredUniqueChars = 0;
+                config.Password.RequireNonAlphanumeric = false;
             })
             .AddEntityFrameworkStores<LibraryManagerDBContext>()
             .AddDefaultTokenProviders();
@@ -51,7 +53,7 @@ namespace LibraryManager
             var mapperConfig = new MapperConfiguration(mc =>
             {
                 mc.AddProfile(new ManagerMapper());
-                mc.AddProfile(new MapperManager());
+                mc.AddProfile(new ValidationMapper());
             });
 
             IMapper mapper = mapperConfig.CreateMapper();
@@ -76,7 +78,7 @@ namespace LibraryManager
             app.UseStaticFiles();
 
             app.UseRouting();
-
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>

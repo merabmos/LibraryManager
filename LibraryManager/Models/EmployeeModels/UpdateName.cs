@@ -1,23 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
-namespace Validation.DTOModels
+namespace LibraryManager.Models.EmployeeModels
 {
-    public class EmployeeRegisterDTO
+    public class UpdateName
     {
+        [Required]
+        [DataType(DataType.Text)]
         public string FirstName { get; set; }
-
+        [Required]
+        [DataType(DataType.Text)]
         public string LastName { get; set; }
 
-        public string UserName { get; set; }
-
-        public string Password { get; set; }
-
+        [Required]
         public int Age { get; set; }
 
-        public string ConfirmPassword { get; set; }
+
     }
 }

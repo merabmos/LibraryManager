@@ -5,11 +5,11 @@ using Microsoft.AspNetCore.Identity;
 using System;
 using System.Threading.Tasks;
 using Validation;
-using Validation.DTOModels;
+using Validation.Models;
 
 namespace Manager
 {
-    public class EmployeeManager : IEmployeeRepo
+    public class EmployeeManager : IEmployeeManager
     {
         private readonly UserManager<Employee> _userManager;
         private readonly SignInManager<Employee> _signInManager;
@@ -42,7 +42,7 @@ namespace Manager
 
         public async Task<IdentityResult> RegisterAsync(Employee entity, string password)
         {
-            var mapp = _mapper.Map<EmployeeRegisterDTO>(entity);
+            var mapp = _mapper.Map<EmployeeVal>(entity);
             var reaction = EmployeeValidation.RegisterEmployeeValidation(mapp);
             IdentityResult identity;
             if (!reaction.Valid)
@@ -61,6 +61,7 @@ namespace Manager
             }
             else
             {
+                entity.ModifyDate = DateTime.Now;
                 var result = await _userManager.CreateAsync(entity, password);
                 if (result.Succeeded)
                 {
@@ -70,5 +71,74 @@ namespace Manager
                 return result;
             }
         }
+
+        public async Task<IdentityResult> UpdateUserNameAsync(Employee entity)
+        {
+            var mapp = _mapper.Map<EmployeeVal>(entity);
+            var reaction = EmployeeValidation.UpdateUserNameValidation(mapp);
+            IdentityResult identity;
+            if (!reaction.Valid)
+            {
+                return identity = IdentityResult.Failed(
+                     new IdentityError[]
+                     {
+                         new IdentityError{
+                             Code = "",
+                             Description = reaction.ErrorMessage
+                         }
+                     }
+                );
+            }
+            else
+            {
+                entity.ModifyDate = DateTime.Now;
+                var result = await _userManager.UpdateAsync(entity);
+                if (result.Succeeded)
+                {
+                    await _signInManager.RefreshSignInAsync(entity);
+                    return null;
+                }
+                return result;
+            }
+        }
+
+        public async Task<IdentityResult> ChangePasswordAsync(Employee entity, string currentPassword, string newPassword)
+        {
+            entity.ModifyDate = DateTime.Now;
+            var result = await _userManager.ChangePasswordAsync(entity, currentPassword, newPassword);
+            if (result.Succeeded)
+            { 
+            await _signInManager.RefreshSignInAsync(entity);
+            return null;
+            }
+            else
+                return result;
+        }
+
+        public async Task<IdentityResult> UpdateNameAsync(Employee entity)
+        {
+            var mapp = _mapper.Map<EmployeeVal>(entity);
+            var reaction = EmployeeValidation.UpdateNameValidation(mapp);
+            IdentityResult identity;
+            if (!reaction.Valid)
+            {
+                return identity = IdentityResult.Failed(
+                     new IdentityError[]
+                     {
+                         new IdentityError{
+                             Code = "",
+                             Description = reaction.ErrorMessage
+                         }
+                     }
+                );
+            }
+            else
+            {
+                await _signInManager.RefreshSignInAsync(entity);
+                await _userManager.UpdateAsync(entity);
+                return null;
+            }
+        }
+
     }
 }

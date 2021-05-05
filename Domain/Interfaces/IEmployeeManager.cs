@@ -8,10 +8,14 @@ using System.Threading.Tasks;
 
 namespace Domain.Interfaces
 {
-    public interface IEmployeeRepo
+    public interface IEmployeeManager
     {
         Task<IdentityResult> RegisterAsync(Employee entity, string password);
-        Task LogOutAsync();
         Task<SignInResult> LogInAsync(string username, string password);
+        Task LogOutAsync();
+        Task<IdentityResult> UpdateUserNameAsync(Employee entity);
+        Task<IdentityResult> ChangePasswordAsync(Employee entity , string currentPassword,string newPassword);
+        Task<IdentityResult> UpdateNameAsync(Employee entity);
+
     }
 }

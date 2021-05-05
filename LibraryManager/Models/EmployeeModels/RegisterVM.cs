@@ -29,6 +29,7 @@ namespace LibraryManager.Models.EmployeeModels
         [Required]
         [DataType(DataType.Password)]
         [Compare("Password",ErrorMessage = "This Confirm Password Doesn't match Entered Password ")]
+        [Display(Name = "Confirm Password")]
         public string ConfirmPassword  { get; set; }
 
     }

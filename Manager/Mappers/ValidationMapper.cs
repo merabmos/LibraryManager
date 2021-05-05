@@ -5,15 +5,15 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Validation.DTOModels;
+using Validation.Models;
 
-namespace Manager
+namespace Manager.Mappers
 {
-    public class MapperManager : Profile
+    public class ValidationMapper : Profile
     {
-        public MapperManager()
+        public ValidationMapper()
         {
-            CreateMap<Employee, EmployeeRegisterDTO>();
+            CreateMap<Employee, EmployeeVal>();
         }
     }
 }
