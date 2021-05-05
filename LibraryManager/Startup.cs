@@ -56,6 +56,7 @@ namespace LibraryManager
 
             IMapper mapper = mapperConfig.CreateMapper();
             services.AddSingleton(mapper);
+            services.ConfigureApplicationCookie(options => options.LoginPath = "/Employee/LogIn");    
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

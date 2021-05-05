@@ -24,12 +24,28 @@ namespace Manager
             _mapper = mapper;
         }
 
+        public async Task LogOutAsync()
+        {
+            await _signInManager.SignOutAsync();
+        }
+
+        public async Task<SignInResult> LogInAsync(string username, string password)
+        {
+            var employee = await _userManager.FindByNameAsync(username);
+            var result = await _signInManager.PasswordSignInAsync(employee, password, true, lockoutOnFailure: false);
+            if (result.Succeeded)
+            {
+                return null;
+            }
+            return result;
+        }
+
         public async Task<IdentityResult> RegisterAsync(Employee entity, string password)
         {
             var mapp = _mapper.Map<EmployeeRegisterDTO>(entity);
-            var error = EmployeeValidation.RegisterEmployeeValidation(mapp);
+            var reaction = EmployeeValidation.RegisterEmployeeValidation(mapp);
             IdentityResult identity;
-            if (!error.Valid)
+            if (!reaction.Valid)
             {
                 return identity = IdentityResult.Failed(
                      new IdentityError[]
@@ -37,7 +53,7 @@ namespace Manager
                          new IdentityError{
 
                              Code = "",
-                             Description = error.ErrorMessage
+                             Description = reaction.ErrorMessage
 
                          }
                      }
@@ -48,7 +64,8 @@ namespace Manager
                 var result = await _userManager.CreateAsync(entity, password);
                 if (result.Succeeded)
                 {
-                    await _signInManager.SignInAsync(entity,true);
+                    await _signInManager.SignInAsync(entity, true);
+                    return null;
                 }
                 return result;
             }

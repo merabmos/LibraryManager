@@ -3,6 +3,8 @@ using Domain.Entities;
 using Domain.Interfaces;
 using LibraryManager.Models.EmployeeModels;
 using Manager;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -15,22 +17,49 @@ namespace LibraryManager.Controllers
     {
         private readonly IMapper _mapper;
         private readonly IEmployeeRepo _employeeRepo;
+        private readonly SignInManager<Employee> _signInManager;
+        private readonly UserManager<Employee> _userManager;
 
-        public EmployeeController(IMapper mapper, IEmployeeRepo employeeRepo)
+        public EmployeeController(IMapper mapper, IEmployeeRepo employeeRepo,
+            SignInManager<Employee> signInManager, UserManager<Employee> userManager)
         {
             _mapper = mapper;
             _employeeRepo = employeeRepo;
+            _signInManager = signInManager;
+            _userManager = userManager;
         }
 
+
+        [HttpGet]
+        [Authorize]
+        public IActionResult LogOut()
+        {
+            if (_signInManager.IsSignedIn(User))
+                _employeeRepo.LogOutAsync();
+            return RedirectToAction("Index", "Home");
+
+        }
+
+        [HttpGet]
         public IActionResult LogIn()
         {
-            return View();
+            if (!_signInManager.IsSignedIn(User))
+                return View();
+            return RedirectToAction("Index", "Home");
         }
 
         [HttpPost]
-        public IActionResult LogIn(dynamic rame)
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> LogIn(LogInVM model)
         {
-            return View();
+            var result = await _employeeRepo.LogInAsync(model.UserName, model.Password);
+            if (result != null)
+            {
+                ModelState.AddModelError("", "Password or UserName is wrong!");
+                return View(model);
+            }
+            else
+                return RedirectToAction("Index", "Home");
         }
 
         public IActionResult Register()

@@ -1,4 +1,4 @@
-﻿@inject SignInManager<Employee> signInManager;
+﻿@inject SignInManager<Employee> signInManager
 @inject UserManager<Employee> userManager
 
 @{
@@ -23,22 +23,35 @@
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="navbar-collapse collapse d-sm-inline-flex flex-sm-row-reverse">
-                    <ul class="navbar-nav flex-grow-1">
-                        @if (signInManager.IsSignedIn(User) && employee != null)
+                    <ul class="navbar-nav d-flex justify-content-end flex-grow-1">
+                        @if (signInManager.IsSignedIn(User) && User != null)
+                        {
+                            <li class="d-flex">
+                                <div class="dropdown">
+                                    <button type="button" class="btn dropdown-toggle" data-toggle="dropdown">
+                                        @employee.FirstName @employee.LastName
+                                        <span class="caret"></span>
+                                    </button>
+                                    <div class="dropdown-menu">
+                                        <a class="dropdown-item text-dark" asp-area="" asp-controller="Account" asp-action="LogOut">Log Out</a>
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="nav-item float-right">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Employee" asp-action="LogOut"> Log Out</a>
+                            </li>
+                        }
+                        else
                         {
                             <li class="nav-item">
-                                <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Employee" asp-action="Register">Register</a>
                             </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-                        }
-                        else { 
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Employee" asp-action="Register">Register</a>
-                        </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-dark" asp-area="" asp-controller="Employee" asp-action="LogIn">Log In</a>
+                            </li>
                         }
                     </ul>
+          
                 </div>
             </div>
         </nav>

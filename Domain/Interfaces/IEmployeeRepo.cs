@@ -11,5 +11,7 @@ namespace Domain.Interfaces
     public interface IEmployeeRepo
     {
         Task<IdentityResult> RegisterAsync(Employee entity, string password);
+        Task LogOutAsync();
+        Task<SignInResult> LogInAsync(string username, string password);
     }
 }
