@@ -1,0 +1,108 @@
+﻿@model DetailsVM
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h1>Details</h1>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Details">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="UserName" class="control-label"></label>
+                <input asp-for="UserName" class="form-control" />
+                <span asp-validation-for="UserName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="FirstName" class="control-label"></label>
+                <input asp-for="FirstName" class="form-control" />
+                <span asp-validation-for="FirstName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="LastName" class="control-label"></label>
+                <input asp-for="LastName" class="form-control" />
+                <span asp-validation-for="LastName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Age" class="control-label"></label>
+                <input asp-for="Age" class="form-control" />
+                <span asp-validation-for="Age" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<button type="button" class="btn btn-primary" data-toggle="modal" data-target="#exampleModal">
+    Change Password
+</button>
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Change Password</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    @*<partial>
+                            @await Html.PartialAsync("ChangePassword")
+                        </partial>*@
+                    <form>
+                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                    <div class="form-group">
+                        <label asp-for="PasswordVM.CurrentPassword" class="control-label"></label>
+                        <input id="CurrentPassword" asp-for="PasswordVM.CurrentPassword" class="form-control" required/>
+                        <span asp-validation-for="PasswordVM.CurrentPassword" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="PasswordVM.NewPassword" class="control-label"></label>
+                        <input id="NewPassword" asp-for="PasswordVM.NewPassword" class="form-control" required/>
+                        <span asp-validation-for="PasswordVM.NewPassword" class="text-danger"></span>
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="PasswordVM.ConfirmPassword" class="control-label"></label>
+                        <input id="ConfirmPassword" asp-for="PasswordVM.ConfirmPassword" class="form-control" required/>
+                        <span asp-validation-for="PasswordVM.ConfirmPassword" class="text-danger"></span>
+                    </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="submit" id="SaveChange" class="btn btn-primary">Save Changes</button>
+                </div>
+            </div>
+        </div>
+</div>
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+<script>
+    $(document).ready(function () {
+        $("#SaveChange").click(function () {
+            $("#ModelOnly").html("");
+            var current = $("#CurrentPassword").val();
+            var newPass = $("#NewPassword").val();
+            var confirm = $("#ConfirmPassword").val();
+            "&confirm={2}"
+            $.ajax({
+                type: "post",
+                url: "/employee/changepassword?current=" + current + "&newPass=" + newPass + "&confirm=" + confirm,
+                success: function (response) {
+                    if (response == null) {
+                        console.log("Ar maq fuli");
+                    }
+                    console.log("aa");
+                }
+            });
+        });
+    });
+</script>

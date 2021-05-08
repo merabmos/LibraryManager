@@ -2,6 +2,7 @@
 using Domain.Entities;
 using Domain.Interfaces;
 using LibraryManager.Models.EmployeeModels;
+using LibraryManager.Validations.Interfaces;
 using Manager;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -19,15 +20,17 @@ namespace LibraryManager.Controllers
         private readonly IEmployeeManager _employeeRepo;
         private readonly SignInManager<Employee> _signInManager;
         private readonly UserManager<Employee> _userManager;
-
+        private readonly IEmployeeValidation _employeeValidation;
 
         public EmployeeController(IMapper mapper, IEmployeeManager employeeRepo,
-            SignInManager<Employee> signInManager, UserManager<Employee> userManager)
+            SignInManager<Employee> signInManager, UserManager<Employee> userManager,
+            IEmployeeValidation employeeValidation)
         {
             _mapper = mapper;
             _employeeRepo = employeeRepo;
             _signInManager = signInManager;
             _userManager = userManager;
+            _employeeValidation = employeeValidation;
         }
 
 
@@ -87,89 +90,67 @@ namespace LibraryManager.Controllers
             }
         }
 
-
         [HttpGet]
         [Authorize]
-        public async Task<IActionResult> UpdateUserName()
+        public async Task<IActionResult> Details()
         {
             var employee = await _userManager.GetUserAsync(User);
-            UpdateUserNameVM model = new UpdateUserNameVM()
-            {
-                UserName = employee.UserName
-            };
-            return View(model);
+            var mapp = _mapper.Map<DetailsVM>(employee);
+            return View(mapp);
         }
 
         [HttpPost]
-        public async Task<IActionResult> UpdateUserName(UpdateUserNameVM model)
+        public async Task<IActionResult> Details(DetailsVM detailsVM)
         {
-            var employee = await _userManager.GetUserAsync(User);
-            employee.UserName = model.UserName;
-            var result =  await _employeeRepo.UpdateUserNameAsync(employee);
-            if (result != null)
+            //Check username exist or not
+            var reaction = await _employeeValidation.CheckUserNameAsync(User,detailsVM.UserName);
+            var currentEmployee = await _userManager.GetUserAsync(User);
+            if (reaction.Valid)
             {
-                foreach (var error in result.Errors)
-                {
-                    ModelState.AddModelError("",error.Description);
-                }
+                    currentEmployee.UserName = detailsVM.UserName;
+                    currentEmployee.FirstName = detailsVM.FirstName;
+                    currentEmployee.LastName = detailsVM.LastName;
+                    currentEmployee.Age = detailsVM.Age;
+                    var result = await _employeeRepo.UpdateDetailsAsync(currentEmployee);
+                    if (result != null)
+                    {
+                        foreach (var error in result.Errors)
+                        {
+                            ModelState.AddModelError("", error.Description);
+                        }
+                    }
+            }
+            else
+            {
+                ModelState.AddModelError("", reaction.ErrorMessage);
             }
 
-            return View(model);
-        }
-
-        [HttpGet]
-        [Authorize]
-        public IActionResult ChangePassword()
-        {
-            return View();
+            return View(detailsVM);
         }
 
         [HttpPost]
-        public async Task<IActionResult> ChangePassword(ChangePasswordVM model)
+        public async Task<DetailsVM> ChangePassword(string current, string newPass, string confirm)
         {
-            var entity= await _userManager.GetUserAsync(User);
-            var result = await _employeeRepo.ChangePasswordAsync(entity,model.CurrentPassword,model.NewPassword);
-            if (result != null)
+            if (ModelState.IsValid)
             {
-                foreach (var error in result.Errors)
+                var entity = await _userManager.GetUserAsync(User);
+                var result = await _employeeRepo.ChangePasswordAsync(entity, current, current);
+                if (result != null)
                 {
-                    ModelState.AddModelError("", error.Description);
-                }
-            }
-            return RedirectToAction("Index","Home");
-        }
-
-        [HttpGet]
-        [Authorize]
-        public async Task<IActionResult> UpdateName()
-        {
-            var employee = await _userManager.GetUserAsync(User);
-            UpdateName model = new UpdateName()
-            {
-                FirstName = employee.FirstName,
-                LastName = employee.LastName,
-                Age = employee.Age
-            };
-            return View(model);
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> UpdateName(UpdateName model)
-        {
-            var employee = await _userManager.GetUserAsync(User);
-            employee.FirstName = model.FirstName;
-            employee.LastName = model.LastName;
-            employee.Age = model.Age;
-            var result = await _employeeRepo.UpdateNameAsync(employee);
-            if (result != null)
-            {
-                foreach (var error in result.Errors)
-                {
-                    ModelState.AddModelError("", error.Description);
+                    foreach (var error in result.Errors)
+                    {
+                        ModelState.AddModelError("", error.Description);
+                    }
+                     return null;
                 }
             }
 
-            return View(model);
+            DetailsVM detailsVM = new DetailsVM() { };
+            detailsVM.PasswordVM.CurrentPassword = current;
+            detailsVM.PasswordVM.ConfirmPassword = confirm;
+            detailsVM.PasswordVM.NewPassword = newPass;
+
+            return detailsVM;
         }
     }
 }

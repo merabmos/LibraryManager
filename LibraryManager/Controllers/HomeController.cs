@@ -18,7 +18,10 @@ namespace LibraryManager.Controllers
         {
             _logger = logger;
         }
-
+        // log4net
+        //sb-admin
+        //pop up
+        //add logger
         [Authorize]
         public IActionResult Index()
         {

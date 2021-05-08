@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Domain.Entities;
 using Domain.Interfaces;
+using LibraryManager.Validations.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using System;
 using System.Threading.Tasks;
@@ -14,14 +15,15 @@ namespace Manager
         private readonly UserManager<Employee> _userManager;
         private readonly SignInManager<Employee> _signInManager;
         private readonly IMapper _mapper;
-
+        private readonly IEmployeeValidation _employeeValidation;
         public EmployeeManager(UserManager<Employee> userManager,
             SignInManager<Employee> signInManager,
-            IMapper mapper)
+            IMapper mapper, IEmployeeValidation employeeValidation)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _mapper = mapper;
+            _employeeValidation = employeeValidation;
         }
 
         public async Task LogOutAsync()
@@ -43,7 +45,7 @@ namespace Manager
         public async Task<IdentityResult> RegisterAsync(Employee entity, string password)
         {
             var mapp = _mapper.Map<EmployeeVal>(entity);
-            var reaction = EmployeeValidation.RegisterEmployeeValidation(mapp);
+            var reaction = _employeeValidation.RegisterEmployeeValidation(mapp);
             IdentityResult identity;
             if (!reaction.Valid)
             {
@@ -61,6 +63,7 @@ namespace Manager
             }
             else
             {
+                entity.Password = password;
                 var result = await _userManager.CreateAsync(entity, password);
                 if (result.Succeeded)
                 {
@@ -71,22 +74,35 @@ namespace Manager
             }
         }
 
-        public async Task<IdentityResult> UpdateUserNameAsync(Employee entity)
+        public async Task<IdentityResult> UpdateDetailsAsync(Employee entity)
         {
             var mapp = _mapper.Map<EmployeeVal>(entity);
-            var reaction = EmployeeValidation.UpdateUserNameValidation(mapp);
-            IdentityResult identity;
-            if (!reaction.Valid)
+            var reactionUserName = _employeeValidation.UpdateUserNameValidation(mapp);
+            var reactionDetails = _employeeValidation.UpdateDetailsValidation(mapp);
+
+            if (!reactionUserName.Valid)
             {
-                return identity = IdentityResult.Failed(
+                return  IdentityResult.Failed(
                      new IdentityError[]
                      {
                          new IdentityError{
                              Code = "",
-                             Description = reaction.ErrorMessage
+                             Description = reactionUserName.ErrorMessage
                          }
                      }
                 );
+            }
+            else if (!reactionDetails.Valid)
+            {
+                return  IdentityResult.Failed(
+                   new IdentityError[]
+                   {
+                         new IdentityError{
+                             Code = "",
+                             Description = reactionDetails.ErrorMessage
+                         }
+                   }
+              );
             }
             else
             {
@@ -104,40 +120,17 @@ namespace Manager
         public async Task<IdentityResult> ChangePasswordAsync(Employee entity, string currentPassword, string newPassword)
         {
             entity.ModifyDate = DateTime.Now;
+            entity.Password = newPassword;
             var result = await _userManager.ChangePasswordAsync(entity, currentPassword, newPassword);
             if (result.Succeeded)
-            { 
-            await _signInManager.RefreshSignInAsync(entity);
-            return null;
+            {
+                await _signInManager.RefreshSignInAsync(entity);
+                return null;
             }
             else
                 return result;
         }
 
-        public async Task<IdentityResult> UpdateNameAsync(Employee entity)
-        {
-            var mapp = _mapper.Map<EmployeeVal>(entity);
-            var reaction = EmployeeValidation.UpdateNameValidation(mapp);
-            IdentityResult identity;
-            if (!reaction.Valid)
-            {
-                return identity = IdentityResult.Failed(
-                     new IdentityError[]
-                     {
-                         new IdentityError{
-                             Code = "",
-                             Description = reaction.ErrorMessage
-                         }
-                     }
-                );
-            }
-            else
-            {
-                await _signInManager.RefreshSignInAsync(entity);
-                await _userManager.UpdateAsync(entity);
-                return null;
-            }
-        }
 
     }
 }

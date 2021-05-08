@@ -10,6 +10,7 @@ namespace Domain.Entities
         public string FirstName { get; set; }
         public string LastName { get; set; }
         public int Age { get; set; }
+        public string Password { get; set; }
         public DateTime InsertDate { get; set; }
         public DateTime? ModifyDate { get; set; }
         public DateTime? DeleteDate { get; set; }

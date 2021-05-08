@@ -3,6 +3,7 @@ using Database;
 using Domain.Entities;
 using Domain.Interfaces;
 using LibraryManager.Mappers;
+using LibraryManager.Validations.Interfaces;
 using Manager;
 using Manager.Mappers;
 using Microsoft.AspNetCore.Builder;
@@ -17,6 +18,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Validation;
+
 namespace LibraryManager
 {
     public class Startup
@@ -36,6 +39,8 @@ namespace LibraryManager
             options.UseSqlServer(Configuration.GetConnectionString("DataBaseConnection")));
 
             services.AddScoped<IEmployeeManager,EmployeeManager>();
+            services.AddScoped<IEmployeeValidation, EmployeeValidation>();
+
 
 
             services.AddIdentity<Employee, IdentityRole>(config =>

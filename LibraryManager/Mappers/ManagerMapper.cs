@@ -14,6 +14,8 @@ namespace LibraryManager.Mappers
         {
             CreateMap<RegisterVM, Employee>();
             CreateMap<Employee, RegisterVM>();
+            CreateMap<DetailsVM, Employee>();
+            CreateMap<Employee, DetailsVM>();
         }
     }
 }
