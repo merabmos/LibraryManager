@@ -87,15 +87,17 @@
 <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
 <script>
     $(document).ready(function () {
+        var mainpass = new Object();
+        mainpass.CurrentPassowrd = $("#CurrentPassword").val();
+        mainpass.NewPassword = $("#NewPassword").val();
+        mainpass.ConfirmPassword = $("#ConfirmPassword").val();
+
         $("#SaveChange").click(function () {
             $("#ModelOnly").html("");
-            var current = $("#CurrentPassword").val();
-            var newPass = $("#NewPassword").val();
-            var confirm = $("#ConfirmPassword").val();
-            "&confirm={2}"
             $.ajax({
                 type: "post",
-                url: "/employee/changepassword?current=" + current + "&newPass=" + newPass + "&confirm=" + confirm,
+                data: JSON.stringify(data),
+                url: "/employee/changepassword",
                 success: function (response) {
                     if (response == null) {
                         console.log("Ar maq fuli");
