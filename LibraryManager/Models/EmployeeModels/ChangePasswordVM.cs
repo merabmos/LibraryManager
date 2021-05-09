@@ -24,6 +24,7 @@ namespace LibraryManager.Models.EmployeeModels
         [Compare("NewPassword", ErrorMessage = "This Confirm Password Doesn't match The new Password ")]
         public  string ConfirmPassword { get; set; }
 
+        public List<string> Validations { get; set; } = new List<string>();
 
     }
 }

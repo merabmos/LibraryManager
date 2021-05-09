@@ -129,23 +129,27 @@ namespace LibraryManager.Controllers
         }
 
         [HttpPost]
-        public async Task<ChangePasswordVM> ChangePassword(ChangePasswordVM change)
+        public ChangePasswordVM ChangePassword(string Current,string New,string Confirm)
         {
-            if (ModelState.IsValid)
-            {
-                var entity = await _userManager.GetUserAsync(User);
-                var result = await _employeeRepo.ChangePasswordAsync(entity, change.CurrentPassword, change.CurrentPassword);
-                if (result != null)
-                {
-                    foreach (var error in result.Errors)
-                    {
-                        ModelState.AddModelError("", error.Description);
-                    }
-                     return null;
-                }
-            }
+            ChangePasswordVM passwordVM = new ChangePasswordVM();
+            passwordVM.ConfirmPassword = Confirm;
+            passwordVM.CurrentPassword = Current;
+            passwordVM.NewPassword = New;
 
-            return change;
+            //if (ModelState.IsValid)
+            //{
+            //    var entity = await _userManager.GetUserAsync(User);
+            //    var result = await _employeeRepo.ChangePasswordAsync(entity, Current, New);
+            //    if (result != null)
+            //    {
+            //        foreach (var error in result.Errors)
+            //        {
+            //            ModelState.AddModelError("", error.Description);
+            //        }
+            //         return null;
+            //    }
+            //}
+            return passwordVM;
         }
     }
 }

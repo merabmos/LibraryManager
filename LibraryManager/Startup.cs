@@ -38,7 +38,7 @@ namespace LibraryManager
             services.AddDbContext<LibraryManagerDBContext>(options =>
             options.UseSqlServer(Configuration.GetConnectionString("DataBaseConnection")));
 
-            services.AddScoped<IEmployeeManager,EmployeeManager>();
+            services.AddScoped<IEmployeeManager, EmployeeManager>();
             services.AddScoped<IEmployeeValidation, EmployeeValidation>();
 
 
@@ -63,7 +63,7 @@ namespace LibraryManager
 
             IMapper mapper = mapperConfig.CreateMapper();
             services.AddSingleton(mapper);
-            services.ConfigureApplicationCookie(options => options.LoginPath = "/Employee/LogIn");    
+            services.ConfigureApplicationCookie(options => options.LoginPath = "/Employee/LogIn");
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -88,6 +88,10 @@ namespace LibraryManager
 
             app.UseEndpoints(endpoints =>
             {
+                endpoints.MapControllerRoute(
+                name: "ChangePassword",
+                 pattern: "{controller=Employee}/{action=ChangePassword}");
+
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
