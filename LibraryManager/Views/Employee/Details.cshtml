@@ -52,27 +52,9 @@
                     </button>
                 </div>
                 <div class="modal-body">
-                    @*<partial>
+                         <partial>
                             @await Html.PartialAsync("ChangePassword")
-                        </partial>*@
-                    <form>
-                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                    <div class="form-group">
-                        <label asp-for="PasswordVM.CurrentPassword" class="control-label"></label>
-                        <input id="CurrentPassword" asp-for="PasswordVM.CurrentPassword" class="form-control" required/>
-                        <span asp-validation-for="PasswordVM.CurrentPassword" class="text-danger"></span>
-                    </div>
-                    <div class="form-group">
-                        <label asp-for="PasswordVM.NewPassword" class="control-label"></label>
-                        <input id="NewPassword" asp-for="PasswordVM.NewPassword" class="form-control" required/>
-                        <span asp-validation-for="PasswordVM.NewPassword" class="text-danger"></span>
-                    </div>
-                    <div class="form-group">
-                        <label asp-for="PasswordVM.ConfirmPassword" class="control-label"></label>
-                        <input id="ConfirmPassword" asp-for="PasswordVM.ConfirmPassword" class="form-control" required/>
-                        <span asp-validation-for="PasswordVM.ConfirmPassword" class="text-danger"></span>
-                    </div>
-                    </form>
+                        </partial>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
@@ -84,24 +66,3 @@
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 }
-<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
-<script>
-     $(document).ready(function () {
-        $("#SaveChange").click(function () {
-            var CurrentPassowrd = $("#CurrentPassword").val();
-            var NewPassword = $("#NewPassword").val();
-            var ConfirmPassword = $("#ConfirmPassword").val();
-            $("#ModelOnly").html("");
-            $.ajax({
-                type: "post",
-                url: "/Employee/ChangePassword?Current=" + CurrentPassowrd + "&New=" + NewPassword + "&Confirm=" + ConfirmPassword,
-                success: function (response) {
-                    if (response == null) {
-                        console.log("Ar maq fuli");
-                    }
-                    console.log(response);
-                }
-            });
-        });
-      });
-</script>

@@ -159,5 +159,53 @@ namespace Validation
                 return result;
             }
         }
+
+        public async Task<ValidationResult> ChangePasswordValidationsAsync(ClaimsPrincipal User, string Current, string New, string Confirm)
+        {
+            ValidationResult validation = new ValidationResult();
+            // Don't be empty
+            if (Current != null && New != null &&  Confirm != null)
+            {
+                var currentUser = await _userManager.GetUserAsync(User);
+                bool isRightOrNot = await _userManager.CheckPasswordAsync(currentUser, Current);
+                if (isRightOrNot)
+                {
+                    // If New password field match Confirm password field
+                    if (New == Confirm)
+                    {
+                        // New password must not match Current password
+                        if (Current != New)
+                        {
+                            validation.Valid = true;
+                            return validation;
+                        }
+                        else
+                        {
+                            validation.ErrorMessage = "New Password is Used By You Already";
+                            validation.Valid = false;
+                            return validation;
+                        }
+                    }
+                    else
+                    {
+                        validation.ErrorMessage = "New Password Does Not Match Confirm Password";
+                        validation.Valid = false;
+                        return validation;
+                    }
+                }
+                else
+                {
+                    validation.ErrorMessage = "Current Password Is Not Right";
+                    validation.Valid = false;
+                    return validation;
+                }
+            }
+            else
+            {
+                validation.ErrorMessage = "You Must Enter All Given Fields";
+                validation.Valid = false;
+                return validation;
+            }
+        }
     }
 }

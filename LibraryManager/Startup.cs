@@ -89,10 +89,6 @@ namespace LibraryManager
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllerRoute(
-                name: "ChangePassword",
-                 pattern: "{controller=Employee}/{action=ChangePassword}");
-
-                endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
             });

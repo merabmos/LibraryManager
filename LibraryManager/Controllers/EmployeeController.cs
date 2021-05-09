@@ -103,22 +103,22 @@ namespace LibraryManager.Controllers
         public async Task<IActionResult> Details(DetailsVM detailsVM)
         {
             //Check username exist or not
-            var reaction = await _employeeValidation.CheckUserNameAsync(User,detailsVM.UserName);
+            var reaction = await _employeeValidation.CheckUserNameAsync(User, detailsVM.UserName);
             var currentEmployee = await _userManager.GetUserAsync(User);
             if (reaction.Valid)
             {
-                    currentEmployee.UserName = detailsVM.UserName;
-                    currentEmployee.FirstName = detailsVM.FirstName;
-                    currentEmployee.LastName = detailsVM.LastName;
-                    currentEmployee.Age = detailsVM.Age;
-                    var result = await _employeeRepo.UpdateDetailsAsync(currentEmployee);
-                    if (result != null)
+                currentEmployee.UserName = detailsVM.UserName;
+                currentEmployee.FirstName = detailsVM.FirstName;
+                currentEmployee.LastName = detailsVM.LastName;
+                currentEmployee.Age = detailsVM.Age;
+                var result = await _employeeRepo.UpdateDetailsAsync(currentEmployee);
+                if (result != null)
+                {
+                    foreach (var error in result.Errors)
                     {
-                        foreach (var error in result.Errors)
-                        {
-                            ModelState.AddModelError("", error.Description);
-                        }
+                        ModelState.AddModelError("", error.Description);
                     }
+                }
             }
             else
             {
@@ -129,27 +129,38 @@ namespace LibraryManager.Controllers
         }
 
         [HttpPost]
-        public ChangePasswordVM ChangePassword(string Current,string New,string Confirm)
+        public async Task<ChangePasswordVM> ChangePassword(string Current, string New, string Confirm)
         {
             ChangePasswordVM passwordVM = new ChangePasswordVM();
-            passwordVM.ConfirmPassword = Confirm;
-            passwordVM.CurrentPassword = Current;
-            passwordVM.NewPassword = New;
-
-            //if (ModelState.IsValid)
-            //{
-            //    var entity = await _userManager.GetUserAsync(User);
-            //    var result = await _employeeRepo.ChangePasswordAsync(entity, Current, New);
-            //    if (result != null)
-            //    {
-            //        foreach (var error in result.Errors)
-            //        {
-            //            ModelState.AddModelError("", error.Description);
-            //        }
-            //         return null;
-            //    }
-            //}
-            return passwordVM;
+            passwordVM.ValidationsMessage = new List<string>();
+            var reaction = await _employeeValidation.ChangePasswordValidationsAsync(User,Current,New,Confirm);
+            if (reaction.Valid)
+            {
+                var entity = await _userManager.GetUserAsync(User);
+                var result = await _employeeRepo.ChangePasswordAsync(entity, Current, New);
+                if (result != null)
+                {
+                    passwordVM.Valid = false;
+                    foreach (var error in result.Errors)
+                    {
+                        passwordVM.ValidationsMessage.Add(error.Description);
+                    }
+                    return passwordVM;
+                }
+                else
+                {
+                    passwordVM.Valid = true;
+                    passwordVM.SuccessMessage = "Password changed successfully";
+                    return passwordVM;
+                }
+            }
+            else
+            {
+                passwordVM.Valid = false;
+                passwordVM.ValidationsMessage.Add(reaction.ErrorMessage);
+                return passwordVM;
+            }
+          
         }
     }
 }
