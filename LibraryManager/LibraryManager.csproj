@@ -23,9 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="Logs\Log-20210510.txt">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    <Folder Include="Logs\" />
   </ItemGroup>
 
 </Project>

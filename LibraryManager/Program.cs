@@ -21,8 +21,6 @@ namespace LibraryManager
             Host.CreateDefaultBuilder(args).ConfigureLogging((hostingContext, logging) =>
             {
                 logging.AddConfiguration(hostingContext.Configuration.GetSection("Logging"));
-                logging.AddEventSourceLogger();
-                // Enable NLog as one of the Logging Provider
                 logging.AddNLog();
             })
                 .ConfigureWebHostDefaults(webBuilder =>
