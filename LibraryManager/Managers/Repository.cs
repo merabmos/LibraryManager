@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Manager
+namespace LibraryManager.Managers
 {
     public class Repository<T> : IRepository<T> where T : class
     {

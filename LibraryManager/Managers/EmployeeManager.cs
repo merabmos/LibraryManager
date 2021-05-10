@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 using Validation;
 using Validation.Models;
 
-namespace Manager
+namespace LibraryManager.Managers
 {
     public class EmployeeManager : IEmployeeManager
     {

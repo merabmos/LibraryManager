@@ -2,6 +2,7 @@ using AutoMapper;
 using Database;
 using Domain.Entities;
 using Domain.Interfaces;
+using LibraryManager.Managers;
 using LibraryManager.Mappers;
 using LibraryManager.Validations.Interfaces;
 using Manager;
@@ -14,8 +15,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Validation;
@@ -69,6 +72,7 @@ namespace LibraryManager
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+           
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
