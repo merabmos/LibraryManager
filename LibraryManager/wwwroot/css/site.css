@@ -69,3 +69,42 @@ body {
   white-space: nowrap;
   line-height: 60px; /* Vertically center the text there */
 }
+.dropdown .dropdown-menu .dropdown-header {
+    font-weight: 800;
+    font-size: 0.65rem;
+}
+
+.dropdown.no-arrow .dropdown-toggle::after {
+    display: none;
+}
+.bg-login-image {
+    background-position: center;
+    background-size: cover;
+}
+
+.bg-register-image {
+    background-position: center;
+    background-size: cover;
+}
+
+.bg-password-image {
+    background-position: center;
+    background-size: cover;
+}
+
+form.user .custom-checkbox.small label {
+    line-height: 1.5rem;
+}
+
+form.user .form-control-user {
+    font-size: 0.8rem;
+    border-radius: 10rem;
+    padding: 1.5rem 1rem;
+}
+
+form.user .btn-user {
+    font-size: 0.8rem;
+    border-radius: 10rem;
+    padding: 0.75rem 1rem;
+}
+ 

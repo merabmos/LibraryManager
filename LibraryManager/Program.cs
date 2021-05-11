@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using NLog;
 using NLog.Extensions.Logging;
 using System;
 using System.Collections.Generic;
@@ -12,6 +13,8 @@ namespace LibraryManager
 {
     public class Program
     {
+        //private static Logger logger = LogManager.GetCurrentClassLogger();
+
         public static void Main(string[] args)
         {
             CreateHostBuilder(args).Build().Run();

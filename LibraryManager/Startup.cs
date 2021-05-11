@@ -4,6 +4,7 @@ using Domain.Entities;
 using Domain.Interfaces;
 using LibraryManager.Managers;
 using LibraryManager.Mappers;
+using LibraryManager.Validations;
 using LibraryManager.Validations.Interfaces;
 using Manager;
 using Manager.Mappers;
@@ -75,7 +76,8 @@ namespace LibraryManager
            
             if (env.IsDevelopment())
             {
-                app.UseDeveloperExceptionPage();
+                app.UseExceptionHandler("/Home/Error");
+                //app.UseDeveloperExceptionPage();
             }
             else
             {

@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Identity;
 using Validation.Models;
 using Validation.ResultModels;
 
-namespace Validation
+namespace LibraryManager.Validations
 {
     public class EmployeeValidation : IEmployeeValidation
     {
