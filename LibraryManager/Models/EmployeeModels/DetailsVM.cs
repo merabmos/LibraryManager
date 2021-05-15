@@ -24,6 +24,13 @@ namespace LibraryManager.Models.EmployeeModels
         [DataType(DataType.Text)]
         public string UserName { get; set; }
 
+        [RegularExpression(@"^5{1}[0-9]{2}[0-9]{6}$",
+            ErrorMessage = "Characters are not allowed.")]
+        [Display(Name = "Phone Number")]
+        [Required]
+        public string PhoneNumber { get; set; }
+
         public ChangePasswordVM PasswordVM { get; set; } = new ChangePasswordVM();
+
     }
 }

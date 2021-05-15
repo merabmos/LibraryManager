@@ -15,5 +15,6 @@ namespace Domain.Interfaces
         Task LogOutAsync();
         Task<IdentityResult> UpdateDetailsAsync(Employee entity);
         Task<IdentityResult> ChangePasswordAsync(Employee entity , string currentPassword,string newPassword);
+
     }
 }

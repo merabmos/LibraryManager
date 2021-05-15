@@ -32,5 +32,10 @@ namespace LibraryManager.Models.EmployeeModels
         [Display(Name = "Confirm Password")]
         public string ConfirmPassword  { get; set; }
 
+        [RegularExpression(@"^5{1}[0-9]{2}[0-9]{6}$",
+             ErrorMessage = "Characters are not allowed.")]
+        [Display(Name = "Phone Number")]
+        [Required]
+        public string PhoneNumber { get; set; }
     }
 }

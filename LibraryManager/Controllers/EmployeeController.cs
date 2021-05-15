@@ -21,18 +21,44 @@ namespace LibraryManager.Controllers
         private readonly SignInManager<Employee> _signInManager;
         private readonly UserManager<Employee> _userManager;
         private readonly IEmployeeValidation _employeeValidation;
+        private readonly IRepository<Employee> _repository;
 
         public EmployeeController(IMapper mapper, IEmployeeManager employeeRepo,
             SignInManager<Employee> signInManager, UserManager<Employee> userManager,
-            IEmployeeValidation employeeValidation)
+            IEmployeeValidation employeeValidation, IRepository<Employee> repository)
         {
             _mapper = mapper;
             _employeeRepo = employeeRepo;
             _signInManager = signInManager;
             _userManager = userManager;
             _employeeValidation = employeeValidation;
+            _repository = repository;
         }
 
+        public async Task<List<EmployeeVM>> SearchRecord(string search)
+        {
+            var user = await _userManager.FindByIdAsync(search);
+            var mapp = _mapper.Map<EmployeeVM>(user);
+            List<EmployeeVM> employees = new List<EmployeeVM>();
+            employees.Add(mapp);
+            return employees;
+        }
+
+        [Authorize]
+        public ActionResult Index()
+        {
+            var employees = _repository.GetAll();
+            List<EmployeeVM> employeeVM = new List<EmployeeVM>();
+            foreach (var item in employees)
+            {
+                if (item.DeleteDate == null)
+                {
+                    var map = _mapper.Map<EmployeeVM>(item);
+                    employeeVM.Add(map);
+                }
+            }
+            return View(employeeVM);
+        }
 
         [HttpGet]
         [Authorize]
@@ -68,7 +94,9 @@ namespace LibraryManager.Controllers
 
         public IActionResult Register()
         {
-            return View();
+            if (!_signInManager.IsSignedIn(User))
+                return View();
+            return RedirectToAction("Index", "Home");
         }
 
         [HttpPost]
@@ -105,46 +133,54 @@ namespace LibraryManager.Controllers
             //Check username exist or not
             var reaction = await _employeeValidation.CheckUserNameAsync(User, detailsVM.UserName);
             var currentEmployee = await _userManager.GetUserAsync(User);
+            currentEmployee.FirstName = detailsVM.FirstName;
+            currentEmployee.LastName = detailsVM.LastName;
+            currentEmployee.Age = detailsVM.Age;
+            currentEmployee.PhoneNumber = detailsVM.PhoneNumber;
+
             if (reaction.Valid)
             {
                 currentEmployee.UserName = detailsVM.UserName;
-                currentEmployee.FirstName = detailsVM.FirstName;
-                currentEmployee.LastName = detailsVM.LastName;
-                currentEmployee.Age = detailsVM.Age;
+
                 var result = await _employeeRepo.UpdateDetailsAsync(currentEmployee);
+               
                 if (result != null)
-                {
+                    
                     foreach (var error in result.Errors)
-                    {
+                      
                         ModelState.AddModelError("", error.Description);
-                    }
-                }
             }
             else
             {
-                ModelState.AddModelError("", reaction.ErrorMessage);
+                var result = await _employeeRepo.UpdateDetailsAsync(currentEmployee);
+
+                if (result != null)
+                   
+                    foreach (var error in result.Errors)
+                       
+                        ModelState.AddModelError("", error.Description);
+
+                ModelState.AddModelError("", reaction.ErrorMessage + " but other informations are updated");
             }
 
             return View(detailsVM);
         }
 
         [HttpPost]
-        public async Task<ChangePasswordVM> ChangePassword(string Current, string New, string Confirm)
+        public async Task<ChangePasswordVM> ChangePassword([FromBody] ChangePasswordVM request)
         {
             ChangePasswordVM passwordVM = new ChangePasswordVM();
             passwordVM.ValidationsMessage = new List<string>();
-            var reaction = await _employeeValidation.ChangePasswordValidationsAsync(User,Current,New,Confirm);
+            var reaction = await _employeeValidation.ChangePasswordValidationsAsync(User, request);
             if (reaction.Valid)
             {
                 var entity = await _userManager.GetUserAsync(User);
-                var result = await _employeeRepo.ChangePasswordAsync(entity, Current, New);
+                var result = await _employeeRepo.ChangePasswordAsync(entity, request.Current, request.New);
                 if (result != null)
                 {
                     passwordVM.Valid = false;
                     foreach (var error in result.Errors)
-                    {
                         passwordVM.ValidationsMessage.Add(error.Description);
-                    }
                     return passwordVM;
                 }
                 else
@@ -160,7 +196,7 @@ namespace LibraryManager.Controllers
                 passwordVM.ValidationsMessage.Add(reaction.ErrorMessage);
                 return passwordVM;
             }
-          
+
         }
     }
 }

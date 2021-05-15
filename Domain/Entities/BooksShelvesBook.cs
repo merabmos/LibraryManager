@@ -10,11 +10,12 @@ namespace Domain.Entities
         public int Id { get; set; }
         public int BookShelfId { get; set; }
         public int BookId { get; set; }
+        public string CreatorEmployeeId { get; set; }
+        public string ModifierEmployeeId { get; set; }
         public DateTime InsertDate { get; set; }
         public DateTime ModifyDate { get; set; }
         public DateTime DeleteDate { get; set; }
         public int BooksCount { get; set; }
-
         public virtual Book Book { get; set; }
         public virtual BooksShelf BookShelf { get; set; }
     }

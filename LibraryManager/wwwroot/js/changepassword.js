@@ -5,10 +5,14 @@
         var CurrentPassowrd = $("#CurrentPassword").val();
         var NewPassword = $("#NewPassword").val();
         var ConfirmPassword = $("#ConfirmPassword").val();
-        $("#ModelOnly").html("");
+        var request = { Current: CurrentPassowrd, New: NewPassword, Confirm: ConfirmPassword };
         $.ajax({
+            url: "/Employee/ChangePassword",
             type: "post",
-            url: "/Employee/ChangePassword?Current=" + CurrentPassowrd + "&New=" + NewPassword + "&Confirm=" + ConfirmPassword,
+            data: JSON.stringify(request),
+            dataType: 'json',
+            contentType: "application/json; charset=utf-8",
+            // data: { Current: CurrentPassowrd, New: NewPassword,Confirm : ConfirmPassword },
             success: function (response) {
                 if (response.valid) {
                     success.html(response.successMessage);

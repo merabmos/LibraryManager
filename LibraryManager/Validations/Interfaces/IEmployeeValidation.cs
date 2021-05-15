@@ -1,4 +1,5 @@
-﻿using System;
+﻿using LibraryManager.Models.EmployeeModels;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
@@ -15,6 +16,6 @@ namespace LibraryManager.Validations.Interfaces
         ValidationResult UpdateDetailsValidation(EmployeeVal model);
         ValidationResult UpdateUserNameValidation(EmployeeVal model);
         ValidationResult RegisterEmployeeValidation(EmployeeVal model);
-        Task<ValidationResult> ChangePasswordValidationsAsync(ClaimsPrincipal User,string Current, string New, string Confirm);
+        Task<ValidationResult> ChangePasswordValidationsAsync(ClaimsPrincipal User,ChangePasswordVM changePassword);
     }
 }

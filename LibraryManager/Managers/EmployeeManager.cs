@@ -31,6 +31,7 @@ namespace LibraryManager.Managers
             await _signInManager.SignOutAsync();
         }
 
+
         public async Task<SignInResult> LogInAsync(string username, string password)
         {
             var employee = await _userManager.FindByNameAsync(username);
@@ -119,6 +120,7 @@ namespace LibraryManager.Managers
 
         public async Task<IdentityResult> ChangePasswordAsync(Employee entity, string currentPassword, string newPassword)
         {
+            
             entity.ModifyDate = DateTime.Now;
             entity.Password = newPassword;
             var result = await _userManager.ChangePasswordAsync(entity, currentPassword, newPassword);

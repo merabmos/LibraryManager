@@ -18,7 +18,8 @@ namespace Domain.Entities
         public DateTime InsertDate { get; set; }
         public DateTime? ModifyDate { get; set; }
         public DateTime? DeleteDate { get; set; }
-
+        public string CreatorEmployeeId { get; set; }
+        public string ModifierEmployeeId { get; set; }
         public virtual Sector Sector { get; set; }
         public virtual ICollection<BooksShelf> BooksShelves { get; set; }
     }

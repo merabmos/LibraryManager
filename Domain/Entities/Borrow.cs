@@ -16,7 +16,8 @@ namespace Domain.Entities
         public DateTime? ModifyDate { get; set; }
         public DateTime? DeleteDate { get; set; }
         public int BookCount { get; set; }
-
+        public string CreatorEmployeeId { get; set; }
+        public string ModifierEmployeeId { get; set; }
         public virtual Book Book { get; set; }
         public virtual Customer Customer { get; set; }
     }

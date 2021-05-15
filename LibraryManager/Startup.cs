@@ -44,7 +44,8 @@ namespace LibraryManager
 
             services.AddScoped<IEmployeeManager, EmployeeManager>();
             services.AddScoped<IEmployeeValidation, EmployeeValidation>();
-
+            services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+            services.AddScoped<SectorManager>();
 
 
             services.AddIdentity<Employee, IdentityRole>(config =>

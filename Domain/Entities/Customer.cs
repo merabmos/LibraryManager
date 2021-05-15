@@ -19,7 +19,8 @@ namespace Domain.Entities
         public DateTime InsertDate { get; set; }
         public DateTime? ModifyDate { get; set; }
         public DateTime? DeleteDate { get; set; }
-
+        public string CreatorEmployeeId { get; set; }
+        public string ModifierEmployeeId { get; set; }
         public virtual ICollection<Borrow> Borrows { get; set; }
     }
 }

@@ -18,6 +18,8 @@ namespace Domain.Entities
         public string Name { get; set; }
         public int TotalCount { get; set; }
         public int CurrentCount { get; set; }
+        public string CreatorEmployeeId { get; set; }
+        public string ModifierEmployeeId { get; set; }
         public DateTime InsertDate { get; set; }
         public DateTime? ModifyDate { get; set; }
         public DateTime? DeleteDate { get; set; }

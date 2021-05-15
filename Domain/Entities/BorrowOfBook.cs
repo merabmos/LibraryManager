@@ -12,7 +12,12 @@ namespace Domain.Entities
         public string PhoneNumber { get; set; }
         public string BookName { get; set; }
         public int BookCount { get; set; }
+        public string CreatorEmployeeId { get; set; }
+        public string ModifierEmployeeId { get; set; }
         public DateTime TakenDate { get; set; }
         public DateTime BroughtDate { get; set; }
+        public DateTime InsertDate { get; set; }
+        public DateTime? ModifyDate { get; set; }
+        public DateTime? DeleteDate { get; set; }
     }
 }

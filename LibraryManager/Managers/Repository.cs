@@ -1,8 +1,12 @@
 ﻿using Database;
+using Domain.Entities;
 using Domain.Interfaces;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -13,11 +17,19 @@ namespace LibraryManager.Managers
     {
         private LibraryManagerDBContext _context = null;
         private DbSet<T> table = null;
-       
-        public Repository(LibraryManagerDBContext _context)
+        private LibraryManagerDBContext context;
+        private readonly UserManager<Employee> _userManager;
+
+        public Repository(LibraryManagerDBContext context, UserManager<Employee> userManager)
         {
-            this._context = _context;
+            _context = context;
             table = _context.Set<T>();
+            _userManager = userManager;
+        }
+
+        public Repository(LibraryManagerDBContext context)
+        {
+            this.context = context;
         }
 
         public IEnumerable<T> GetAll()
@@ -38,22 +50,41 @@ namespace LibraryManager.Managers
 
         public void Update(T obj)
         {
-            table.Attach(obj);
-            _context.Entry(obj).State = EntityState.Modified;
-            Save();
-
+            if (obj != null)
+            {
+                table.Attach(obj);
+                _context.Entry(obj).State = EntityState.Modified;
+                Save();
+            }
         }
 
-        public void Delete(object id)
+        public virtual async Task DeleteAsync(object id)
         {
-            T existing = table.Find(id);
-            table.Remove(existing);
-            Save();
+            T existing = await table.FindAsync(id);
+            if (existing != null)
+            {
+                table.Remove(existing);
+            }
         }
 
-        private void Save()
+        public List<SelectListItem> GetEmployeesSelectList()
+        {
+            var users = _userManager.Users;
+            List<SelectListItem> employeeSelectList = new List<SelectListItem>();
+            foreach (var employee in _userManager.Users)
+            {
+                SelectListItem selectListItem = new SelectListItem();
+                selectListItem.Text = employee.FirstName + " " + employee.LastName;
+                selectListItem.Value = employee.Id;
+                employeeSelectList.Add(selectListItem);
+            }
+            return employeeSelectList;
+        }
+
+        public void Save()
         {
             _context.SaveChanges();
         }
+      
     }
 }

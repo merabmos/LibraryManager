@@ -5,6 +5,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Domain.Entities;
+using LibraryManager.Models.EmployeeModels;
 using LibraryManager.Validations.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using Validation.Models;
@@ -160,21 +161,21 @@ namespace LibraryManager.Validations
             }
         }
 
-        public async Task<ValidationResult> ChangePasswordValidationsAsync(ClaimsPrincipal User, string Current, string New, string Confirm)
+        public async Task<ValidationResult> ChangePasswordValidationsAsync(ClaimsPrincipal User,ChangePasswordVM changePasswordVM )
         {
             ValidationResult validation = new ValidationResult();
-            // Don't be empty
-            if (Current != null && New != null &&  Confirm != null)
+            // must not be empty
+            if (changePasswordVM.Current != null && changePasswordVM.New != null && changePasswordVM.Confirm != null)
             {
                 var currentUser = await _userManager.GetUserAsync(User);
-                bool isRightOrNot = await _userManager.CheckPasswordAsync(currentUser, Current);
+                bool isRightOrNot = await _userManager.CheckPasswordAsync(currentUser, changePasswordVM.Current);
                 if (isRightOrNot)
                 {
                     // If New password field match Confirm password field
-                    if (New == Confirm)
+                    if (changePasswordVM.New == changePasswordVM.Confirm)
                     {
                         // New password must not match Current password
-                        if (Current != New)
+                        if (changePasswordVM.Current != changePasswordVM.New)
                         {
                             validation.Valid = true;
                             return validation;
