@@ -7,43 +7,14 @@
 <h3> Sectors - Library Manager</h3>
 <hr />
 <a class="btn btn-outline-dark ml-2 mb-2" asp-action="Create">Create New</a>
-<table class="table table-bordered">
+<table class="table table-bordered table-responsive">
     <thead>
         <tr>
-            <td>
-                <input class="form-control mr-sm-2"
-                       id="SearchValue"
-                       type="search"
-                       placeholder="Search"
-                       aria-label="Search">
-            </td>
-            <td>
-                <input type="date" id="InsertDate" min="1000-01-01"
-                       max="3000-12-31" class="form-control mr-sm-2 ml-2">
-            </td>
-            <td>
-                <input type="date" id="ModifyDate" min="1000-01-01"
-                       max="3000-12-31" class="form-control mr-sm-2 ml-2">
-            </td>
-            <td>
-                @Html.DropDownList("CreatorEmployeeId", Model.CreatorEmployeesSelectList, "Select Creator", new { @class = "form-control dropdown-menu-dark" })
-            </td>
-            <td>
-                @Html.DropDownList("ModifierEmployeeId", Model.ModifierEmployeesSelectList, "Select Modifier", new { @class = "form-control dropdown-menu-dark" })
-            </td>
-            <td>
-                <button type="submit" class="btn btn-outline-dark">Search</button>
-            </td>
-        </tr>
-        <tr>
             <th>
-                @Html.DisplayNameFor(model => model.Name)
+                Insert Date Between :
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.InsertDate)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ModifyDate)
+                Modify Date Between :
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.CreatorEmployee)
@@ -55,45 +26,78 @@
                 Options
             </th>
         </tr>
+        <tr>
+            <td>
+                <div class="row">
+                    <div class="col-md-12">
+                        <label class="ml-2 mt-1" for="InsertStartDate">  From : </label>
+                        <input type="date" id="InsertStartDate" min="1000-01-01"
+                               max="3000-12-31" class="w-75 mb-1 float-right form-control mr-sm-2 ml-2">
+                    </div>
+                    <div class="col-md-12">
+                        <label class="ml-2 mt-1" for="InsertEndDate"> To : </label>
+                        <input type="date" id="InsertEndDate" min="1000-01-01"
+                               max="3000-12-31" class="w-75 float-right form-control mr-sm-2 ml-2">
+                    </div>
+                </div>
+            </td>
+            <td>
+                <div class="row">
+                    <div class="col-md-12">
+                        <label class="ml-2 mt-1" for="ModifyStartDate">  From : </label>
+                        <input type="date" id="ModifyStartDate" min="1000-01-01"
+                               max="3000-12-31" class="w-75  mb-1 float-right form-control mr-sm-2 ml-2">
+                    </div>
+                    <div class="col-md-12">
+                        <label class="ml-2 mt-1" for="ModifyEndDate"> To : </label>
+                        <input type="date" id="ModifyEndDate" min="1000-01-01"
+                               max="3000-12-31" class="w-75 float-right form-control mr-sm-2 ml-2">
+                    </div>
+                </div>
+            </td>
+            <td>
+                @Html.DropDownList("CreatorEmployeeId",
+                Model.CreatorEmployeesSelectList,
+                "Select \n Creator",
+                new { @class = " btn btn-secondary" })
+            </td>
+            <td>
+                @Html.DropDownList("ModifierEmployeeId",
+                Model.ModifierEmployeesSelectList,
+                "Select \n Modifier",
+                new { @class = " btn btn-secondary" })
+            </td>
+            <td>
+                <button type="submit" onclick="do_filter('Sector')" id="SearchBtn" class="btn btn-outline-dark">Search</button>
+            </td>
+        </tr>
 
+    </thead>
+</table>
+<table class="table table-responsive ">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Name)
+            </th>
+            <th>
+                Insert Date  :
+            </th>
+            <th>
+                Modify Date  :
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.CreatorEmployee)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ModifierEmployee)
+            </th>
+            <th>
+                Options
+            </th>
+        </tr>
     </thead>
     <tbody id="Data">
     </tbody>
 </table>
-<script>
-    $(document).ready(function () {
-     $("#SearchValue").keyup(function () {
-         var searchValue = $("#SearchValue").val();
-         var creatorEmployeeId = $("#CreatorEmployeeId option:selected").val();
-         var modifierEmployeeId = $("#ModifierEmployeeId option:selected").val();
-         var InsertDate = $("#InsertDate").val();
-         var ModifierDate = $("#ModifyDate").val();
-
-            if (searchValue.length > 0) {
-                var DataTBody = $("#Data");
-                DataTBody.html("");
-                $.ajax({
-                    type: "post",
-                    url: '@Url.Action("SearchRecord")',
-                    data: { search: searchValue },
-                    success: function (response) {
-                        for (var i = 0; i < response.length; i++) {
-                            var row = "<tr>" +
-                                "<td>" + response[i].name + "</td>" +
-                                "<td>" + response[i].insertDate + "</td>" +
-                                "<td>" + response[i].modifyDate + "</td>" +
-                                "<td>" + response[i].creatorEmployeeId + "</td>" +
-                                "<td>" + response[i].modifierEmployeeId + "</td>" +
-                                "<td>" +
-                                "<a" + " href=" + "/Sector/Edit?Id=" + response[i].id +">" + "Edit |" + "</a>" +
-                                "<a" + " href=" + "/Sector/Delete?Id=" + response[i].id + ">" + "Delete" + "</a>" +
-                                "</td>" +
-                                "</tr>";
-                            DataTBody.append(row);
-                        }
-                    }
-                });
-            }
-        });
-    });
-</script>
+<script src="/js/filtertable.js"></script>

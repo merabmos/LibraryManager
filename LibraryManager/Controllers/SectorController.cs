@@ -2,6 +2,7 @@
 using Domain.Entities;
 using Domain.Interfaces;
 using LibraryManager.Managers;
+using LibraryManager.Models.SearchModels;
 using LibraryManager.Models.Sector;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -12,7 +13,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-
+using Newtonsoft.Json;
 namespace LibraryManager.Controllers
 {
     [Authorize]
@@ -30,20 +31,40 @@ namespace LibraryManager.Controllers
             _userManager = userManager;
             _sectorManager = sectorManager;
         }
-
-        public async Task<List<SectorVM>> SearchRecord(string search)
+        public async Task<List<SectorVM>> SearchRecord([FromBody] FilterVM request)
         {
-            var data = await _sectorManager.FindBySearchAsync(search);
-            List<SectorVM> employees = new List<SectorVM>();
+            var data = await _sectorManager.FilterAsync(request);
+            List<SectorVM> sectors = new List<SectorVM>();
             foreach (var item in data)
             {
                 var mapp = _mapper.Map<SectorVM>(item);
-                employees.Add(mapp);
+
+                if (item.CreatorEmployeeId != null)
+                {
+                    var creatorEmployee = await _userManager.FindByIdAsync(item.CreatorEmployeeId);
+                    mapp.CreatorEmployee = creatorEmployee.FirstName + " " + creatorEmployee.LastName;
+                }
+                if (item.ModifierEmployeeId != null)
+                {
+                    var modifierEmployee = await _userManager.FindByIdAsync(item.ModifierEmployeeId);
+                    mapp.ModifierEmployee = modifierEmployee.FirstName + " " + modifierEmployee.LastName;
+                }
+                else
+                {
+                    mapp.ModifierEmployee = "";
+                }
+                sectors.Add(mapp);
             }
-            return employees;
+            return sectors;
         }
-        // GET: SectorController
-        public  ActionResult Index()
+
+        public void CatchData(string response) 
+        {
+        
+        }
+
+        // GET: SectorController 
+        public ActionResult Index(object response)
         {
             SectorVM sectorVM = new SectorVM();
             sectorVM.CreatorEmployeesSelectList.AddRange(_repository.GetEmployeesSelectList());
@@ -64,18 +85,22 @@ namespace LibraryManager.Controllers
         public async Task<ActionResult> Create(CreateSectorVM model)
         {
             var data = await _sectorManager.FindBySearchAsync(model.Name);
-            if (data == null)
+            foreach (var item in data)
             {
-                var mapp = _mapper.Map<Sector>(model);
-                mapp.CreatorEmployeeId = _userManager.GetUserId(User);
-                _repository.Insert(mapp);
-                return RedirectToAction("Create");
+                if (item.DeleteDate != null)
+                {
+                    var mapp = _mapper.Map<Sector>(model);
+                    mapp.CreatorEmployeeId = _userManager.GetUserId(User);
+                    _repository.Insert(mapp);
+                    return RedirectToAction("Create");
+                }
+                else
+                {
+                    ModelState.AddModelError("", "this name already exists");
+                    return View(model);
+                }
             }
-            else
-            {
-                ModelState.AddModelError("", "this name already exists");
-                return View(model);
-            }
+            return View(model);
         }
 
         // GET: SectorController/Edit/5

@@ -13,8 +13,7 @@ namespace Database.Configurations
     {
         public void Configure(EntityTypeBuilder<Section> builder)
         {
-            builder.HasIndex(e => e.Name, "UQ__Sections__737584F660D4979F")
-                    .IsUnique();
+        
 
             builder.Property(e => e.DeleteDate).HasColumnType("datetime");
 

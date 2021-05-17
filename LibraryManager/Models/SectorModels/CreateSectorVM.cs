@@ -4,12 +4,13 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace LibraryManager.Models.EmployeeModels
+namespace LibraryManager.Models.Sector
+
 {
-    public class UpdateUserNameVM
+    public class CreateSectorVM
     {
         [Required]
         [DataType(DataType.Text)]
-        public string UserName { get; set; }
+        public string Name { get; set; }
     }
 }

@@ -6,10 +6,6 @@
 
 <h3>Employees</h3>
 <hr />
-<div class="mb-3 form-inline my-2">
-        <input class="form-control mr-sm-2 w-25" id="SearchValue" type="search" placeholder="Search by User Id" aria-label="Search">
-        <button class="btn btn-outline-success my-2 my-sm-0" id="SearchBtn" type="submit">Search</button>
-</div>
 <table class="table">
     <thead>
         <tr>
@@ -60,34 +56,3 @@
         }
     </tbody>
 </table>
-<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
-<script>
-    $(document).ready(function () {
-        $("#SearchBtn").click(function () {
-            var searchValue = $("#SearchValue").val();
-            if (searchValue.length > 0) {
-                var DataTBody = $("#Data");
-                DataTBody.html("");
-                $.ajax({
-                    type: "post",
-                    url: '@Url.Action("SearchRecord")',
-                    data: { search: searchValue },
-                    success: function (response) {
-                        console.log(response);
-                        for (var i = 0; i < response.length; i++) {
-                            var row = "<tr>" +
-                                "<td>" + response[i].id + "</td>" +
-                                "<td>" + response[i].firstName + "</td>" +
-                                "<td>" + response[i].lastName + "</td>" +
-                                "<td>" + response[i].age + "</td>" +
-                                "<td>" + response[i].insertDate + "</td>" +
-                                "<td>" + response[i].modifyDate + "</td>" +
-                                + "</tr>";
-                            DataTBody.append(row);
-                        }
-                    }
-                });
-            }
-        });
-    });
-</script>

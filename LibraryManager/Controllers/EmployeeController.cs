@@ -143,11 +143,11 @@ namespace LibraryManager.Controllers
                 currentEmployee.UserName = detailsVM.UserName;
 
                 var result = await _employeeRepo.UpdateDetailsAsync(currentEmployee);
-               
+
                 if (result != null)
-                    
+
                     foreach (var error in result.Errors)
-                      
+
                         ModelState.AddModelError("", error.Description);
             }
             else
@@ -155,9 +155,9 @@ namespace LibraryManager.Controllers
                 var result = await _employeeRepo.UpdateDetailsAsync(currentEmployee);
 
                 if (result != null)
-                   
+
                     foreach (var error in result.Errors)
-                       
+
                         ModelState.AddModelError("", error.Description);
 
                 ModelState.AddModelError("", reaction.ErrorMessage + " but other informations are updated");
@@ -169,31 +169,41 @@ namespace LibraryManager.Controllers
         [HttpPost]
         public async Task<ChangePasswordVM> ChangePassword([FromBody] ChangePasswordVM request)
         {
-            ChangePasswordVM passwordVM = new ChangePasswordVM();
-            passwordVM.ValidationsMessage = new List<string>();
-            var reaction = await _employeeValidation.ChangePasswordValidationsAsync(User, request);
-            if (reaction.Valid)
+            try
             {
-                var entity = await _userManager.GetUserAsync(User);
-                var result = await _employeeRepo.ChangePasswordAsync(entity, request.Current, request.New);
-                if (result != null)
+                ChangePasswordVM passwordVM = new ChangePasswordVM();
+                passwordVM.ValidationsMessage = new List<string>();
+                var reaction = await _employeeValidation.ChangePasswordValidationsAsync(User, request);
+                if (reaction.Valid)
                 {
-                    passwordVM.Valid = false;
-                    foreach (var error in result.Errors)
-                        passwordVM.ValidationsMessage.Add(error.Description);
-                    return passwordVM;
+                    var entity = await _userManager.GetUserAsync(User);
+                    var result = await _employeeRepo.ChangePasswordAsync(entity, request.Current, request.New);
+                    if (result != null)
+                    {
+                        passwordVM.Valid = false;
+                        foreach (var error in result.Errors)
+                            passwordVM.ValidationsMessage.Add(error.Description);
+                        return passwordVM;
+                    }
+                    else
+                    {
+                        passwordVM.Valid = true;
+                        passwordVM.SuccessMessage = "Password changed successfully";
+                        return passwordVM;
+                    }
                 }
                 else
                 {
-                    passwordVM.Valid = true;
-                    passwordVM.SuccessMessage = "Password changed successfully";
+                    passwordVM.Valid = false;
+                    passwordVM.ValidationsMessage.Add(reaction.ErrorMessage);
                     return passwordVM;
                 }
             }
-            else
+            catch
             {
-                passwordVM.Valid = false;
-                passwordVM.ValidationsMessage.Add(reaction.ErrorMessage);
+                ChangePasswordVM passwordVM = new ChangePasswordVM();
+                passwordVM.ValidationsMessage = new List<string>();
+                passwordVM.ValidationsMessage.Add("A problem has been fixed");
                 return passwordVM;
             }
 
