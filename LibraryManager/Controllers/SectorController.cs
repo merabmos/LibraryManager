@@ -58,9 +58,9 @@ namespace LibraryManager.Controllers
             return sectors;
         }
 
-        public void CatchData(string response) 
+        public void CatchData(string response)
         {
-        
+
         }
 
         // GET: SectorController 
@@ -85,22 +85,32 @@ namespace LibraryManager.Controllers
         public async Task<ActionResult> Create(CreateSectorVM model)
         {
             var data = await _sectorManager.FindBySearchAsync(model.Name);
-            foreach (var item in data)
+            if (data.Count() != 0)
             {
-                if (item.DeleteDate != null)
+                foreach (var item in data)
                 {
-                    var mapp = _mapper.Map<Sector>(model);
-                    mapp.CreatorEmployeeId = _userManager.GetUserId(User);
-                    _repository.Insert(mapp);
-                    return RedirectToAction("Create");
+                    if (item.DeleteDate != null)
+                    {
+                        var mapp = _mapper.Map<Sector>(model);
+                        mapp.CreatorEmployeeId = _userManager.GetUserId(User);
+                        _repository.Insert(mapp);
+                    }
+                    else
+                    {
+                        ModelState.AddModelError("", "this name already exists");
+                        return View(model);
+                    }
                 }
-                else
-                {
-                    ModelState.AddModelError("", "this name already exists");
-                    return View(model);
-                }
+                 return RedirectToAction("Create");
             }
-            return View(model);
+            else 
+            {
+                var mapp = _mapper.Map<Sector>(model);
+                mapp.CreatorEmployeeId = _userManager.GetUserId(User);
+                _repository.Insert(mapp);
+                return RedirectToAction("Create");
+            }
+
         }
 
         // GET: SectorController/Edit/5
@@ -121,7 +131,7 @@ namespace LibraryManager.Controllers
             sector.ModifierEmployeeId = _userManager.GetUserId(User);
             sector.ModifyDate = DateTime.Now;
             _repository.Update(sector);
-            return View(sectorVM);
+            return RedirectToAction("Index","Sector");
         }
 
         // GET: SectorController/Delete/5
