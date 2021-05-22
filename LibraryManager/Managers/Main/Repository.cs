@@ -11,7 +11,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace LibraryManager.Managers
+namespace LibraryManager.Managers.Main
 {
     public class Repository<T> : IRepository<T> where T : class
     {

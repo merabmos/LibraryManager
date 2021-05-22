@@ -1,95 +1,65 @@
 ﻿using Database;
 using Domain.Entities;
 using Domain.Interfaces;
+using LibraryManager.Managers.Main;
 using LibraryManager.Models.SearchModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 
 namespace LibraryManager.Managers
 {
     public class SectorManager : Repository<Sector>, ISectorManager
     {
+        private readonly IFilter<Sector> _filter;
         private readonly LibraryManagerDBContext _context;
-        public SectorManager(LibraryManagerDBContext context) : base(context)
+        public SectorManager(LibraryManagerDBContext context, IFilter<Sector> filter) : base(context)
         {
             _context = context;
+            _filter = filter;
         }
+
 
         public async Task<List<Sector>> FilterAsync(FilterVM filter)
         {
-            return await Task.Run(() =>
+            var sectors = _context.Sectors.Where(o => o.DeleteDate == null).ToList();
+
+            List<Sector> GetByCreators = await _filter.GetListById(filter.CreatorId, "CreatorEmployeeId", sectors);
+            List<Sector> GetByModifiers = await _filter.GetListById(filter.ModifierId, "ModifierEmployeeId", sectors);
+            List<Sector> GetByBetweenModifyDate = await _filter.FilterInBetweenDates(filter.ModifyStartDate, filter.ModifyEndDate, "ModifyDate", sectors);
+            List<Sector> GetByBetweenInsertDate = await _filter.FilterInBetweenDates(filter.InsertStartDate, filter.InsertEndDate, "InsertDate", sectors);
+
+            if (GetByCreators.Count() == 0)
             {
-                DateTime insertStartDate;
-                DateTime insertEndDate;
-                DateTime modifyStartDate;
-                DateTime modifyEndDate;
-                List<Sector> sectors = new List<Sector>();
-                if (filter.CreatorId.Count() != 0)
-                    sectors = _context.Sectors.Where(o => o.CreatorEmployeeId == filter.CreatorId && o.DeleteDate == null).ToList();
-                if (filter.ModifierId.Count() != 0 && sectors.Count() != 0)
-                    sectors = sectors.Where(o => o.ModifierEmployeeId == filter.ModifierId && o.DeleteDate == null).ToList();
-                else
-                {
-                    if (filter.ModifierId.Count() != 0)
-                    {
-                        sectors = _context.Sectors.Where(o => o.ModifierEmployeeId == filter.ModifierId && o.DeleteDate == null).ToList();
-                    }
-                }
-
-                if (sectors.Count() != 0)
-                {
-                    if (filter.InsertStartDate.Count() != 0)
-                    {
-                        insertStartDate = DateTime.Parse(filter.InsertStartDate);
-                        sectors = sectors.Where(o => o.InsertDate >= insertStartDate && o.DeleteDate == null).ToList();
-                    }
-                }
-                else
-                {
-                    if (filter.InsertStartDate.Count() != 0)
-                    {
-                        insertStartDate = DateTime.Parse(filter.InsertStartDate);
-                        sectors = _context.Sectors.Where(o => o.InsertDate >= insertStartDate && o.DeleteDate == null).ToList();
-                    }
-                }
-
-                if (sectors.Count() != 0)
-                {
-                    if (filter.InsertStartDate.Count() != 0 && filter.InsertEndDate.Count() != 0)
-                    {
-                        insertEndDate = DateTime.Parse(filter.InsertEndDate);
-                        sectors = sectors.Where(o => o.InsertDate <= insertEndDate && o.DeleteDate == null).ToList();
-                    }
-                }
-                else
-                {
-                    if (filter.InsertStartDate.Count() != 0 && filter.InsertEndDate.Count() != 0)
-                    {
-                        insertEndDate = DateTime.Parse(filter.InsertEndDate);
-                        sectors = _context.Sectors.Where(o => o.InsertDate <= insertEndDate && o.DeleteDate == null).ToList();
-                    }
-                }
-                if (sectors.Count() != 0)
-                {
-                    if (filter.ModifyStartDate.Count() != 0)
-                    {
-                        modifyStartDate = DateTime.Parse(filter.ModifyStartDate);
-                        sectors = sectors.Where(o => o.ModifyDate >= modifyStartDate && o.DeleteDate == null).ToList();
-                    }
-                }
-                else
-                {
-                    if (filter.ModifyStartDate.Count() != 0 && filter.ModifyEndDate.Count() != 0)
-                    {
-                        modifyEndDate = DateTime.Parse(filter.ModifyEndDate);
-                        sectors = _context.Sectors.Where(o => o.InsertDate <= modifyEndDate && o.DeleteDate == null).ToList();
-                    }
-                }
-
-                return sectors;
-            });
+                var commons = sectors.Select(s => s.Id)
+                    .Intersect(GetByModifiers.Select(s2 => s2.Id).ToList())
+                    .Intersect(GetByBetweenInsertDate.Select(s3 => s3.Id).ToList())
+                    .Intersect(GetByBetweenModifyDate.Select(s4 => s4.Id).ToList()).ToList();
+            }
+            else if (GetByModifiers.Count() == 0)
+            {
+                 var commons = sectors.Select(s => s.Id)
+                    .Intersect(GetByCreators.Select(s1 => s1.Id).ToList())
+                    .Intersect(GetByBetweenInsertDate.Select(s3 => s3.Id).ToList())
+                    .Intersect(GetByBetweenModifyDate.Select(s4 => s4.Id).ToList()).ToList();
+            }
+            else if (GetByModifiers.Count() == 0 && GetByCreators.Count() == 0)
+            {
+                var commons = sectors.Select(s => s.Id)
+                    .Intersect(GetByBetweenInsertDate.Select(s3 => s3.Id).ToList())
+                    .Intersect(GetByBetweenModifyDate.Select(s4 => s4.Id).ToList()).ToList();
+            }
+            else
+            {
+               var  commons = sectors.Select(s => s.Id)
+                      .Intersect(GetByModifiers.Select(s2 => s2.Id).ToList())
+                      .Intersect(GetByCreators.Select(s1 => s1.Id).ToList())
+                      .Intersect(GetByBetweenInsertDate.Select(s3 => s3.Id).ToList())
+                      .Intersect(GetByBetweenModifyDate.Select(s4 => s4.Id).ToList()).ToList();
+            }
+            return sectors;
         }
 
         public async Task<List<Sector>> FindBySearchAsync(object search)

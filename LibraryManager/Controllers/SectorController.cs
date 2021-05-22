@@ -33,7 +33,7 @@ namespace LibraryManager.Controllers
         }
         public async Task<List<SectorVM>> SearchRecord([FromBody] FilterVM request)
         {
-            var data = await _sectorManager.FilterAsync(request);
+            var data =  await _sectorManager.FilterAsync(request);
             List<SectorVM> sectors = new List<SectorVM>();
             foreach (var item in data)
             {
@@ -50,9 +50,7 @@ namespace LibraryManager.Controllers
                     mapp.ModifierEmployee = modifierEmployee.FirstName + " " + modifierEmployee.LastName;
                 }
                 else
-                {
                     mapp.ModifierEmployee = "";
-                }
                 sectors.Add(mapp);
             }
             return sectors;

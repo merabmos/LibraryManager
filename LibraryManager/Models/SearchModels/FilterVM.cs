@@ -9,7 +9,7 @@ namespace LibraryManager.Models.SearchModels
     public class FilterVM
     {
         public string CreatorId { get; set; }
-        public string ModifierId { get; set; } 
+        public string ModifierId { get; set; }
         public string InsertStartDate { get; set; }
         public string InsertEndDate { get; set; }
         public string ModifyStartDate { get; set; }

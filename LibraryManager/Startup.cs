@@ -3,6 +3,7 @@ using Database;
 using Domain.Entities;
 using Domain.Interfaces;
 using LibraryManager.Managers;
+using LibraryManager.Managers.Main;
 using LibraryManager.Mappers;
 using LibraryManager.Validations;
 using LibraryManager.Validations.Interfaces;
@@ -39,12 +40,13 @@ namespace LibraryManager
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllersWithViews();
-            services.AddDbContext<LibraryManagerDBContext>(options =>
-            options.UseSqlServer(Configuration.GetConnectionString("DataBaseConnection")));
+            services.AddDbContext<LibraryManagerDBContext>(
+            options => options.UseSqlServer(Configuration.GetConnectionString("DataBaseConnection")));
 
             services.AddScoped<IEmployeeManager, EmployeeManager>();
             services.AddScoped<IEmployeeValidation, EmployeeValidation>();
             services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+            services.AddScoped(typeof(IFilter<>), typeof(Filter<>));
             services.AddScoped<SectorManager>();
 
 

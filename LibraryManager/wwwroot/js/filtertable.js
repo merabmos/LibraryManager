@@ -23,15 +23,14 @@
         dataType: 'json',
         contentType: "application/json; charset=utf-8",
         success: function (response) {
-            console.log(response);
             for (var i = 0; i < response.length; i++) {
-                $.ajax({
-                    url: '/' + controller + '/CatchData',
-                    type: "post",
-                    contentType: "application/json; charset=utf-8",
-                    dataType: 'json',
-                    data: { response: response[i].name } 
-                });
+                //$.ajax({
+                //    url: '/' + controller + '/CatchData',
+                //    type: "post",
+                //    contentType: "application/json; charset=utf-8",
+                //    dataType: 'json',
+                //    data: { response: response[i].name } 
+                //});
                 var row = "<tr>" +
                     "<td>" + response[i].name + "</td>" +
                     "<td>" + response[i].insertDate + "</td>" +
