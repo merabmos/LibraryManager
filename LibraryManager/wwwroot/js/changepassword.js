@@ -1,11 +1,11 @@
 ﻿$(document).ready(function () {
     $("#SaveChange").click(function () {
-        var error = $("#Error").empty();
-        var success = $("#Success").empty();
-        var CurrentPassowrd = $("#CurrentPassword").val();
-        var NewPassword = $("#NewPassword").val();
-        var ConfirmPassword = $("#ConfirmPassword").val();
-        var request = { Current: CurrentPassowrd, New: NewPassword, Confirm: ConfirmPassword };
+        let error = $("#Error").empty();
+        let success = $("#Success").empty();
+        let CurrentPassowrd = $("#CurrentPassword").val();
+        let NewPassword = $("#NewPassword").val();
+        let ConfirmPassword = $("#ConfirmPassword").val();
+        let request = { Current: CurrentPassowrd, New: NewPassword, Confirm: ConfirmPassword };
         $.ajax({
             url: "/Employee/ChangePassword",
             type: "post",
@@ -18,7 +18,7 @@
                     success.html(response.successMessage);
                 }
                 else {
-                    for (var i = 0; i < response.validationsMessage.length; i++) {
+                    for (let i = 0; i < response.validationsMessage.length; i++) {
                         error.append(
                             "<li  class='text-danger'>" + response.validationsMessage[i] + "</li>"
                         );

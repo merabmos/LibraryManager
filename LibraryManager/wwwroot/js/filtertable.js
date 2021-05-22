@@ -1,12 +1,12 @@
 ﻿function do_filter(controller) {
-    var creatorEmployeeId = $("#CreatorEmployeeId option:selected").val();
-    var modifierEmployeeId = $("#ModifierEmployeeId option:selected").val();
-    var insertStartDate = $("#InsertStartDate").val();
-    var insertEndDate = $("#InsertEndDate").val();
-    var modifyStartDate = $("#ModifyStartDate").val();
-    var modifyEndDate = $("#ModifyEndDate").val();
+    let creatorEmployeeId = $("#CreatorEmployeeId option:selected").val();
+    let modifierEmployeeId = $("#ModifierEmployeeId option:selected").val();
+    let insertStartDate = $("#InsertStartDate").val();
+    let insertEndDate = $("#InsertEndDate").val();
+    let modifyStartDate = $("#ModifyStartDate").val();
+    let modifyEndDate = $("#ModifyEndDate").val();
     console.log(controller);
-    var request = {
+    let request = {
         CreatorId: creatorEmployeeId,
         ModifierId: modifierEmployeeId,
         InsertStartDate: insertStartDate,
@@ -14,7 +14,7 @@
         ModifyStartDate: modifyStartDate,
         ModifyEndDate: modifyEndDate,
     };
-    var DataTBody = $("#Data");
+    let DataTBody = $("#Data");
     DataTBody.html("");
     $.ajax({
         url: '/' + controller + '/SearchRecord',
@@ -23,15 +23,8 @@
         dataType: 'json',
         contentType: "application/json; charset=utf-8",
         success: function (response) {
-            for (var i = 0; i < response.length; i++) {
-                //$.ajax({
-                //    url: '/' + controller + '/CatchData',
-                //    type: "post",
-                //    contentType: "application/json; charset=utf-8",
-                //    dataType: 'json',
-                //    data: { response: response[i].name } 
-                //});
-                var row = "<tr>" +
+            for (let i = 0; i < response.length; i++) {
+                let row = "<tr>" +
                     "<td>" + response[i].name + "</td>" +
                     "<td>" + response[i].insertDate + "</td>" +
                     "<td>" + response[i].modifyDate + "</td>" +
@@ -49,5 +42,3 @@
         }
     });
 }
-//$(document).ready(function () {
-//});

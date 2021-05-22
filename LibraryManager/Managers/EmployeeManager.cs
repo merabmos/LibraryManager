@@ -5,7 +5,6 @@ using LibraryManager.Validations.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using System;
 using System.Threading.Tasks;
-using Validation;
 using Validation.Models;
 
 namespace LibraryManager.Managers
@@ -47,10 +46,9 @@ namespace LibraryManager.Managers
         {
             var mapp = _mapper.Map<EmployeeVal>(entity);
             var reaction = _employeeValidation.RegisterEmployeeValidation(mapp);
-            IdentityResult identity;
             if (!reaction.Valid)
             {
-                return identity = IdentityResult.Failed(
+                return  IdentityResult.Failed(
                      new IdentityError[]
                      {
                          new IdentityError{
