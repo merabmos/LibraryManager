@@ -15,6 +15,7 @@ namespace LibraryManager.Managers
     {
         private readonly IFilter<Sector> _filter;
         private readonly LibraryManagerDBContext _context;
+
         public SectorManager(LibraryManagerDBContext context, IFilter<Sector> filter) : base(context)
         {
             _context = context;
@@ -28,37 +29,16 @@ namespace LibraryManager.Managers
 
             List<Sector> GetByCreators = await _filter.GetListById(filter.CreatorId, "CreatorEmployeeId", sectors);
             List<Sector> GetByModifiers = await _filter.GetListById(filter.ModifierId, "ModifierEmployeeId", sectors);
-            List<Sector> GetByBetweenModifyDate = await _filter.FilterInBetweenDates(filter.ModifyStartDate, filter.ModifyEndDate, "ModifyDate", sectors);
-            List<Sector> GetByBetweenInsertDate = await _filter.FilterInBetweenDates(filter.InsertStartDate, filter.InsertEndDate, "InsertDate", sectors);
+            List<Sector> GetByBetweenModifyDate = await _filter.FilterInBetweenDates(filter.ModifyStartDate,
+                filter.ModifyEndDate, "ModifyDate", sectors);
+            List<Sector> GetByBetweenInsertDate = await _filter.FilterInBetweenDates(filter.InsertStartDate,
+                filter.InsertEndDate, "InsertDate", sectors);
 
-            if (GetByCreators.Count() == 0)
-            {
-                var commons = sectors.Select(s => s.Id)
-                    .Intersect(GetByModifiers.Select(s2 => s2.Id).ToList())
-                    .Intersect(GetByBetweenInsertDate.Select(s3 => s3.Id).ToList())
-                    .Intersect(GetByBetweenModifyDate.Select(s4 => s4.Id).ToList()).ToList();
-            }
-            else if (GetByModifiers.Count() == 0)
-            {
-                 var commons = sectors.Select(s => s.Id)
-                    .Intersect(GetByCreators.Select(s1 => s1.Id).ToList())
-                    .Intersect(GetByBetweenInsertDate.Select(s3 => s3.Id).ToList())
-                    .Intersect(GetByBetweenModifyDate.Select(s4 => s4.Id).ToList()).ToList();
-            }
-            else if (GetByModifiers.Count() == 0 && GetByCreators.Count() == 0)
-            {
-                var commons = sectors.Select(s => s.Id)
-                    .Intersect(GetByBetweenInsertDate.Select(s3 => s3.Id).ToList())
-                    .Intersect(GetByBetweenModifyDate.Select(s4 => s4.Id).ToList()).ToList();
-            }
-            else
-            {
-               var  commons = sectors.Select(s => s.Id)
-                      .Intersect(GetByModifiers.Select(s2 => s2.Id).ToList())
-                      .Intersect(GetByCreators.Select(s1 => s1.Id).ToList())
-                      .Intersect(GetByBetweenInsertDate.Select(s3 => s3.Id).ToList())
-                      .Intersect(GetByBetweenModifyDate.Select(s4 => s4.Id).ToList()).ToList();
-            }
+            var commons = sectors.Select(s => s.Id)
+                .Intersect(GetByModifiers.Select(s2 => s2.Id).ToList())
+                .Intersect(GetByCreators.Select(s1 => s1.Id).ToList())
+                .Intersect(GetByBetweenInsertDate.Select(s3 => s3.Id).ToList())
+                .Intersect(GetByBetweenModifyDate.Select(s4 => s4.Id).ToList()).ToList();
             return sectors;
         }
 
@@ -66,7 +46,7 @@ namespace LibraryManager.Managers
         {
             return await Task.Run(() =>
             {
-                return _context.Sectors.Where(o => o.Name.Contains((string)search)).ToList();
+                return _context.Sectors.Where(o => o.Name.Contains((string) search)).ToList();
             });
         }
 
