@@ -9,11 +9,12 @@ namespace Domain.Interfaces
 {
     public interface IFilter<T> where T : class
     {
+        IEnumerable<T> IntersectAllIfEmpty(params IEnumerable<T>[] lists);
         Task<List<T>> FilterInBetweenDates(string dateStart,
-            string dateEnd, string PropertyName, List<T> Entities);
+            string dateEnd, string propertyName, List<T> elements);
         Task<List<T>> GetListById(string Id, string PropertyName, List<T> Elements);
-        Expression<Func<T, bool>> GreatThan(object value, string DB_EntityDatePropertyName);
-        Expression<Func<T, bool>> LessThan(object value, string DB_EntityDatePropertyName);
-        Expression<Func<T, bool>> ExistOrNot(object value, string DB_EntityPropertyName);
+        Expression<Func<T, bool>> GreatThan(object value, string dbEntityPropertyName);
+        Expression<Func<T, bool>> LessThan(object value, string dbEntityPropertyName);
+        Expression<Func<T, bool>> ExistOrNot(object value, string dbEntityPropertyName);
     }
 }

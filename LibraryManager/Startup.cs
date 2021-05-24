@@ -7,23 +7,14 @@ using LibraryManager.Managers.Main;
 using LibraryManager.Mappers;
 using LibraryManager.Validations;
 using LibraryManager.Validations.Interfaces;
-using Manager;
 using Manager.Mappers;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
-using Validation;
 
 namespace LibraryManager
 {

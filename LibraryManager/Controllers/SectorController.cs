@@ -14,6 +14,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+
 namespace LibraryManager.Controllers
 {
     [Authorize]
@@ -23,6 +24,7 @@ namespace LibraryManager.Controllers
         private readonly IMapper _mapper;
         private readonly UserManager<Employee> _userManager;
         private readonly SectorManager _sectorManager;
+
         public SectorController(IRepository<Sector> repository, IMapper mappers,
             UserManager<Employee> userManager, SectorManager sectorManager)
         {
@@ -31,9 +33,10 @@ namespace LibraryManager.Controllers
             _userManager = userManager;
             _sectorManager = sectorManager;
         }
+
         public async Task<List<SectorVM>> SearchRecord([FromBody] FilterVM request)
         {
-            var data =  await _sectorManager.FilterAsync(request);
+            var data = await _sectorManager.FilterAsync(request);
             List<SectorVM> sectors = new List<SectorVM>();
             foreach (var item in data)
             {
@@ -44,6 +47,7 @@ namespace LibraryManager.Controllers
                     var creatorEmployee = await _userManager.FindByIdAsync(item.CreatorEmployeeId);
                     mapp.CreatorEmployee = creatorEmployee.FirstName + " " + creatorEmployee.LastName;
                 }
+
                 if (item.ModifierEmployeeId != null)
                 {
                     var modifierEmployee = await _userManager.FindByIdAsync(item.ModifierEmployeeId);
@@ -51,14 +55,11 @@ namespace LibraryManager.Controllers
                 }
                 else
                     mapp.ModifierEmployee = "";
+
                 sectors.Add(mapp);
             }
+
             return sectors;
-        }
-
-        public void CatchData(string response)
-        {
-
         }
 
         // GET: SectorController 
@@ -99,9 +100,8 @@ namespace LibraryManager.Controllers
                         return View(model);
                     }
                 }
-                 return RedirectToAction("Create");
             }
-            else 
+            else
             {
                 var mapp = _mapper.Map<Sector>(model);
                 mapp.CreatorEmployeeId = _userManager.GetUserId(User);
@@ -109,6 +109,7 @@ namespace LibraryManager.Controllers
                 return RedirectToAction("Create");
             }
 
+            return RedirectToAction("Create");
         }
 
         // GET: SectorController/Edit/5
@@ -122,14 +123,39 @@ namespace LibraryManager.Controllers
         // POST: SectorController/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(EditSectorVM sectorVM)
+        public async Task<ActionResult> Edit(EditSectorVM model)
         {
-            var sector = _repository.GetById(sectorVM.Id);
-            sector.Name = sectorVM.Name;
-            sector.ModifierEmployeeId = _userManager.GetUserId(User);
-            sector.ModifyDate = DateTime.Now;
-            _repository.Update(sector);
-            return RedirectToAction("Index","Sector");
+            var data = await _sectorManager.FindBySearchAsync(model.Name);
+            if (data.Count() != 0)
+            {
+                foreach (var item in data)
+                {
+                    if (item.DeleteDate != null)
+                    {
+                        var sector = _repository.GetById(model.Id);
+                        sector.Name = model.Name;
+                        sector.ModifierEmployeeId = _userManager.GetUserId(User);
+                        sector.ModifyDate = DateTime.Now;
+                        _repository.Update(sector);
+                    }
+                    else
+                    {
+                        ModelState.AddModelError("", "this name already exists");
+                        return View(model);
+                    }
+                }
+            }
+            else
+            {
+                var sector = _repository.GetById(model.Id);
+                sector.Name = model.Name;
+                sector.ModifierEmployeeId = _userManager.GetUserId(User);
+                sector.ModifyDate = DateTime.Now;
+                _repository.Update(sector);
+                return RedirectToAction("Index", "Sector");
+            }
+
+            return RedirectToAction("Index", "Sector");
         }
 
         // GET: SectorController/Delete/5

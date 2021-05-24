@@ -27,18 +27,32 @@ namespace LibraryManager.Managers
         {
             var sectors = _context.Sectors.Where(o => o.DeleteDate == null).ToList();
 
-            List<Sector> GetByCreators = await _filter.GetListById(filter.CreatorId, "CreatorEmployeeId", sectors);
-            List<Sector> GetByModifiers = await _filter.GetListById(filter.ModifierId, "ModifierEmployeeId", sectors);
-            List<Sector> GetByBetweenModifyDate = await _filter.FilterInBetweenDates(filter.ModifyStartDate,
-                filter.ModifyEndDate, "ModifyDate", sectors);
-            List<Sector> GetByBetweenInsertDate = await _filter.FilterInBetweenDates(filter.InsertStartDate,
-                filter.InsertEndDate, "InsertDate", sectors);
+            List<Sector> GetByBetweenInsertDate = filter.InsertStartDate.Length != 0 || filter.InsertEndDate.Length != 0
+                ? await _filter.FilterInBetweenDates(filter.InsertStartDate,
+                    filter.InsertEndDate, "InsertDate", sectors)
+                : new List<Sector>();
+            List<Sector> GetByCreators = filter.CreatorId.Length != 0
+                ? await _filter.GetListById(filter.CreatorId, "CreatorEmployeeId", sectors)
+                : new List<Sector>();
+            List<Sector> GetByModifiers = filter.ModifierId.Length != 0
+                ? await _filter.GetListById(filter.ModifierId, "ModifierEmployeeId", sectors)
+                : new List<Sector>();
+            List<Sector> GetByBetweenModifyDate = filter.ModifyStartDate.Length != 0 || filter.ModifyEndDate.Length != 0
+                ? await _filter.FilterInBetweenDates(filter.ModifyStartDate,
+                    filter.ModifyEndDate, "ModifyDate", sectors)
+                : new List<Sector>();
 
-            var commons = sectors.Select(s => s.Id)
-                .Intersect(GetByModifiers.Select(s2 => s2.Id).ToList())
-                .Intersect(GetByCreators.Select(s1 => s1.Id).ToList())
-                .Intersect(GetByBetweenInsertDate.Select(s3 => s3.Id).ToList())
-                .Intersect(GetByBetweenModifyDate.Select(s4 => s4.Id).ToList()).ToList();
+                var FilteredSectors = _filter.IntersectAllIfEmpty(sectors, GetByBetweenInsertDate, GetByCreators,
+                    GetByModifiers,
+                    GetByBetweenModifyDate);
+
+            sectors = new List<Sector>();
+
+            foreach (var item in FilteredSectors)
+            {
+                sectors.Add(item);
+            }
+
             return sectors;
         }
 
