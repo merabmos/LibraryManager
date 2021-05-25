@@ -5,99 +5,116 @@
 }
 
 <h3> Sectors - Library Manager</h3>
-<hr />
+<hr/>
 <a class="btn btn-outline-dark ml-2 mb-2" asp-action="Create">Create New</a>
-<table class="table table-bordered table-responsive">
+<table class="table table-bordered table-responsive-lg">
     <thead>
-        <tr>
-            <th>
-                Insert Date Between :
-            </th>
-            <th>
-                Modify Date Between :
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.CreatorEmployee)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ModifierEmployee)
-            </th>
-            <th>
-                Options
-            </th>
-        </tr>
-        <tr>
-            <td>
-                <div class="row">
-                    <div class="col-md-12">
-                        <label class="ml-2 mt-1" for="InsertStartDate">  From : </label>
-                        <input type="date" id="InsertStartDate" min="1000-01-01"
-                               max="3000-12-31" class="w-75 mb-1 float-right form-control mr-sm-2 ml-2">
-                    </div>
-                    <div class="col-md-12">
-                        <label class="ml-2 mt-1" for="InsertEndDate"> To : </label>
-                        <input type="date" id="InsertEndDate" min="1000-01-01"
-                               max="3000-12-31" class="w-75 float-right form-control mr-sm-2 ml-2">
-                    </div>
+    <tr>
+        <th>
+            Insert Date Between :
+        </th>
+        <th>
+            Modify Date Between :
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.CreatorEmployee)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.ModifierEmployee)
+        </th>
+        <th>
+            Options
+        </th>
+    </tr>
+    <tr>
+        <td>
+            <div class="row">
+                <div class="col-md-12">
+                    <label class="ml-2 mt-1" for="InsertStartDate"> From : </label>
+                    <input type="date" id="InsertStartDate" min="1000-01-01"
+                           max="3000-12-31" class="w-75 mb-1 float-right form-control mr-sm-2 ml-2">
                 </div>
-            </td>
-            <td>
-                <div class="row">
-                    <div class="col-md-12">
-                        <label class="ml-2 mt-1" for="ModifyStartDate">  From : </label>
-                        <input type="date" id="ModifyStartDate" min="1000-01-01"
-                               max="3000-12-31" class="w-75  mb-1 float-right form-control mr-sm-2 ml-2">
-                    </div>
-                    <div class="col-md-12">
-                        <label class="ml-2 mt-1" for="ModifyEndDate"> To : </label>
-                        <input type="date" id="ModifyEndDate" min="1000-01-01"
-                               max="3000-12-31" class="w-75 float-right form-control mr-sm-2 ml-2">
-                    </div>
+                <div class="col-md-12">
+                    <label class="ml-2 mt-1" for="InsertEndDate"> To : </label>
+                    <input type="date" id="InsertEndDate" min="1000-01-01"
+                           max="3000-12-31" class="w-75 float-right form-control mr-sm-2 ml-2">
                 </div>
-            </td>
-            <td>
-                @Html.DropDownList("CreatorEmployeeId",
+            </div>
+        </td>
+        <td>
+            <div class="row">
+                <div class="col-md-12">
+                    <label class="ml-2 mt-1" for="ModifyStartDate"> From : </label>
+                    <input type="date" id="ModifyStartDate" min="1000-01-01"
+                           max="3000-12-31" class="w-75  mb-1 float-right form-control mr-sm-2 ml-2">
+                </div>
+                <div class="col-md-12">
+                    <label class="ml-2 mt-1" for="ModifyEndDate"> To : </label>
+                    <input type="date" id="ModifyEndDate" min="1000-01-01"
+                           max="3000-12-31" class="w-75 float-right form-control mr-sm-2 ml-2">
+                </div>
+            </div>
+        </td>
+        <td>
+            @Html.DropDownList("CreatorEmployeeId",
                 Model.CreatorEmployeesSelectList,
                 "Select \n Creator",
-                new { @class = " btn btn-secondary" })
-            </td>
-            <td>
-                @Html.DropDownList("ModifierEmployeeId",
+                new {@class = " btn btn-secondary"})
+        </td>
+        <td>
+            @Html.DropDownList("ModifierEmployeeId",
                 Model.ModifierEmployeesSelectList,
                 "Select \n Modifier",
-                new { @class = " btn btn-secondary" })
-            </td>
-            <td>
-                <button type="submit" onclick="do_filter('Sector')" id="SearchBtn" class="btn btn-outline-dark">Fitler</button>
-            </td>
-        </tr>
+                new {@class = " btn btn-secondary"})
+        </td>
+        <td>
+            <button type="submit" onclick="do_filter('Sector')" id="SearchBtn" class="btn btn-outline-dark">Fitler</button>
+        </td>
+    </tr>
 
     </thead>
 </table>
-<table class="table table-responsive ">
+<table class="table table-responsive-lg ">
     <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Name)
-            </th>
-            <th>
-                Insert Date  :
-            </th>
-            <th>
-                Modify Date  :
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.CreatorEmployee)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.ModifierEmployee)
-            </th>
-            <th>
-                Options
-            </th>
-        </tr>
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.Name)
+        </th>
+        <th>
+            Insert Date :
+        </th>
+        <th>
+            Modify Date :
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.CreatorEmployee)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.ModifierEmployee)
+        </th>
+        <th>
+            Options
+        </th>
+    </tr>
     </thead>
     <tbody id="Data">
+        @*<tr>
+        <td>
+            @Html.DisplayFor(model => model.Name)
+        </td>
+        <td>
+            @Html.DisplayFor(model => model.InsertDate)
+        </td>
+        <td>
+            @Html.DisplayFor(model => model.ModifyDate)
+        </td>
+        <td>
+            @Html.DisplayFor(model => model.CreatorEmployee)
+        </td>
+        <td>
+            @Html.DisplayFor(model => model.ModifierEmployee)
+        </td>
+    </tr>*@
     </tbody>
 </table>
 <script src="/js/filtertable.js"></script>

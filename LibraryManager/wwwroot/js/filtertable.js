@@ -31,8 +31,8 @@
                     "<td>" + response[i].creatorEmployee + "</td>" +
                     "<td>" + response[i].modifierEmployee + "</td>" +
                     "<td>" +
-                    "<a" + " href=" + "/Sector/Edit?Id=" + response[i].id + ">" + "Edit |" + "</a>" +
-                    "<a" + " href=" + "/Sector/Delete?Id=" + response[i].id + ">" + "Delete" + "</a>" +
+                    "<a" + "href=" + "/Sector/Edit?Id=" + response[i].id + ">" + "Edit |" + "</a>" +
+                    "<a" + "href=" + "/Sector/Delete?Id=" + response[i].id + ">" + "Delete" + "</a>" +
                     "</td>" +
                     "</tr>";
                 DataTBody.append(row);

@@ -9,26 +9,30 @@ namespace LibraryManager.Managers.Main
 {
     public class Filter<T> : IFilter<T> where T : class
     {
-        public  IEnumerable<T> IntersectAllIfEmpty(params IEnumerable<T>[] lists)
+        public IEnumerable<T> IntersectAllIfEmpty(params IEnumerable<T>[] lists)
         {
             IEnumerable<T> results = null;
-            var notNullList = lists.Where(l => l != null);
-            lists = notNullList.Where(l => l.Any()).ToArray();
-                         
-            if (lists.Length > 0)
-            {
-                results = lists[0];
 
-                for (int i = 1; i < lists.Length; i++)
-                    results = results.Intersect(lists[i]);
-            }
-            else
+            lists = lists.Where(l => l != null).ToArray();
+
+            if (lists.Any())
             {
-                results = new T[0];
+                if (lists.Length > 0)
+                {
+                    results = lists[0];
+
+                    for (int i = 1; i < lists.Length; i++)
+                        results = results.Intersect(lists[i]);
+                }
+                else
+                {
+                    results = new T[0];
+                }
             }
 
             return results;
         }
+
         public async Task<List<T>> FilterInBetweenDates(string dateStart,
             string dateEnd, string propertyName, List<T> elements)
         {
@@ -54,25 +58,26 @@ namespace LibraryManager.Managers.Main
             if (entities.Count() != 0)
                 return entities;
             else
-                return null;
+                return new List<T>();
         }
+
         public async Task<List<T>> GetListById(string Id, string PropertyName, List<T> Elements)
         {
             return await Task.Run(() =>
             {
-                List<T> Entities = new List<T>();
+                List<T> entities = new List<T>();
                 if (Id.Count() != 0)
                 {
                     Func<T, bool> check = ExistOrNot(Id, PropertyName).Compile();
                     foreach (var item in Elements)
                         if (check(item))
-                            Entities.Add(item);
+                            entities.Add(item);
                 }
 
-                if (Entities.Count() != 0)
-                    return Entities;
+                if (entities.Count() != 0)
+                    return entities;
                 else
-                    return null;
+                    return new List<T>();
             });
         }
 
@@ -99,9 +104,9 @@ namespace LibraryManager.Managers.Main
             BinaryExpression body =
                 Expression.GreaterThanOrEqual(column, Expression.Convert(Expression.Constant(value), column.Type));
 
-            var ExpressionTree = Expression.Lambda<Func<T, bool>>(body, new[] {pe});
+            var expressionTree = Expression.Lambda<Func<T, bool>>(body, new[] {pe});
 
-            return ExpressionTree;
+            return expressionTree;
         }
 
         public Expression<Func<T, bool>> LessThan(object value, string dbEntityPropertyName)

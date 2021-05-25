@@ -15,6 +15,7 @@ namespace LibraryManager.Managers
         private readonly SignInManager<Employee> _signInManager;
         private readonly IMapper _mapper;
         private readonly IEmployeeValidation _employeeValidation;
+
         public EmployeeManager(UserManager<Employee> userManager,
             SignInManager<Employee> signInManager,
             IMapper mapper, IEmployeeValidation employeeValidation)
@@ -34,12 +35,16 @@ namespace LibraryManager.Managers
         public async Task<SignInResult> LogInAsync(string username, string password)
         {
             var employee = await _userManager.FindByNameAsync(username);
-            var result = await _signInManager.PasswordSignInAsync(employee, password, true, lockoutOnFailure: false);
-            if (result.Succeeded)
+            if (employee != null)
             {
-                return null;
+                var result =
+                    await _signInManager.PasswordSignInAsync(employee, password, true, lockoutOnFailure: false);
+                if (result.Succeeded)
+                    return result;
+                else
+                    return null;
             }
-            return result;
+            return null;
         }
 
         public async Task<IdentityResult> RegisterAsync(Employee entity, string password)
@@ -48,16 +53,15 @@ namespace LibraryManager.Managers
             var reaction = _employeeValidation.RegisterEmployeeValidation(mapp);
             if (!reaction.Valid)
             {
-                return  IdentityResult.Failed(
-                     new IdentityError[]
-                     {
-                         new IdentityError{
-
-                             Code = "",
-                             Description = reaction.ErrorMessage
-
-                         }
-                     }
+                return IdentityResult.Failed(
+                    new IdentityError[]
+                    {
+                        new IdentityError
+                        {
+                            Code = "",
+                            Description = reaction.ErrorMessage
+                        }
+                    }
                 );
             }
             else
@@ -69,6 +73,7 @@ namespace LibraryManager.Managers
                     await _signInManager.SignInAsync(entity, true);
                     return null;
                 }
+
                 return result;
             }
         }
@@ -81,27 +86,29 @@ namespace LibraryManager.Managers
 
             if (!reactionUserName.Valid)
             {
-                return  IdentityResult.Failed(
-                     new IdentityError[]
-                     {
-                         new IdentityError{
-                             Code = "",
-                             Description = reactionUserName.ErrorMessage
-                         }
-                     }
+                return IdentityResult.Failed(
+                    new IdentityError[]
+                    {
+                        new IdentityError
+                        {
+                            Code = "",
+                            Description = reactionUserName.ErrorMessage
+                        }
+                    }
                 );
             }
             else if (!reactionDetails.Valid)
             {
-                return  IdentityResult.Failed(
-                   new IdentityError[]
-                   {
-                         new IdentityError{
-                             Code = "",
-                             Description = reactionDetails.ErrorMessage
-                         }
-                   }
-              );
+                return IdentityResult.Failed(
+                    new IdentityError[]
+                    {
+                        new IdentityError
+                        {
+                            Code = "",
+                            Description = reactionDetails.ErrorMessage
+                        }
+                    }
+                );
             }
             else
             {
@@ -112,13 +119,14 @@ namespace LibraryManager.Managers
                     await _signInManager.RefreshSignInAsync(entity);
                     return null;
                 }
+
                 return result;
             }
         }
 
-        public async Task<IdentityResult> ChangePasswordAsync(Employee entity, string currentPassword, string newPassword)
+        public async Task<IdentityResult> ChangePasswordAsync(Employee entity, string currentPassword,
+            string newPassword)
         {
-            
             entity.ModifyDate = DateTime.Now;
             entity.Password = newPassword;
             var result = await _userManager.ChangePasswordAsync(entity, currentPassword, newPassword);
@@ -130,7 +138,5 @@ namespace LibraryManager.Managers
             else
                 return result;
         }
-
-
     }
 }

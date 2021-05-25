@@ -90,9 +90,9 @@ namespace LibraryManager.Controllers
                 {
                     if (item.DeleteDate != null)
                     {
-                        var mapp = _mapper.Map<Sector>(model);
-                        mapp.CreatorEmployeeId = _userManager.GetUserId(User);
-                        _repository.Insert(mapp);
+                        item.CreatorEmployeeId = _userManager.GetUserId(User);
+                        item.DeleteDate = null;
+                            _repository.Update(item);
                     }
                     else
                     {
@@ -130,13 +130,12 @@ namespace LibraryManager.Controllers
             {
                 foreach (var item in data)
                 {
-                    if (item.DeleteDate != null)
+                    if (item.DeleteDate == null && item.Id == model.Id)
                     {
-                        var sector = _repository.GetById(model.Id);
-                        sector.Name = model.Name;
-                        sector.ModifierEmployeeId = _userManager.GetUserId(User);
-                        sector.ModifyDate = DateTime.Now;
-                        _repository.Update(sector);
+                        item.Name = model.Name;
+                        item.ModifierEmployeeId = _userManager.GetUserId(User);
+                        item.ModifyDate = DateTime.Now;
+                        _repository.Update(item);
                     }
                     else
                     {

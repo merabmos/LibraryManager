@@ -26,25 +26,26 @@ namespace LibraryManager.Managers
         public async Task<List<Sector>> FilterAsync(FilterVM filter)
         {
             var sectors = _context.Sectors.Where(o => o.DeleteDate == null).ToList();
-
+            
             List<Sector> GetByBetweenInsertDate = filter.InsertStartDate.Length != 0 || filter.InsertEndDate.Length != 0
                 ? await _filter.FilterInBetweenDates(filter.InsertStartDate,
                     filter.InsertEndDate, "InsertDate", sectors)
-                : new List<Sector>();
+                : null;
             List<Sector> GetByCreators = filter.CreatorId.Length != 0
                 ? await _filter.GetListById(filter.CreatorId, "CreatorEmployeeId", sectors)
-                : new List<Sector>();
+                : null;
             List<Sector> GetByModifiers = filter.ModifierId.Length != 0
                 ? await _filter.GetListById(filter.ModifierId, "ModifierEmployeeId", sectors)
-                : new List<Sector>();
+                : null;
             List<Sector> GetByBetweenModifyDate = filter.ModifyStartDate.Length != 0 || filter.ModifyEndDate.Length != 0
                 ? await _filter.FilterInBetweenDates(filter.ModifyStartDate,
                     filter.ModifyEndDate, "ModifyDate", sectors)
-                : new List<Sector>();
+                : null;
 
-                var FilteredSectors = _filter.IntersectAllIfEmpty(sectors, GetByBetweenInsertDate, GetByCreators,
-                    GetByModifiers,
-                    GetByBetweenModifyDate);
+
+            var FilteredSectors = _filter.IntersectAllIfEmpty(sectors, GetByBetweenInsertDate, GetByCreators,
+                GetByModifiers,
+                GetByBetweenModifyDate);
 
             sectors = new List<Sector>();
 
@@ -60,6 +61,7 @@ namespace LibraryManager.Managers
         {
             return await Task.Run(() =>
             {
+                // && o.DeleteDate == null
                 return _context.Sectors.Where(o => o.Name.Contains((string) search)).ToList();
             });
         }

@@ -83,7 +83,7 @@ namespace LibraryManager.Controllers
         public async Task<IActionResult> LogIn(LogInVM model)
         {
             var result = await _employeeRepo.LogInAsync(model.UserName, model.Password);
-            if (result != null)
+            if (result == null)
             {
                 ModelState.AddModelError("", "Password or UserName is wrong!");
                 return View(model);
