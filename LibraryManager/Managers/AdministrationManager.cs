@@ -76,5 +76,18 @@ namespace LibraryManager.Managers
             }
             return result;
         }
+
+        public async Task<bool> IsInRoleAsync(Employee employee,string role)
+        {
+            if (await _userManager.IsInRoleAsync(employee, role))
+            {
+               return true;
+            }
+            else
+            {
+              return false;
+            }
+        }
+        
     }
 }

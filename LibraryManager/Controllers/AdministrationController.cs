@@ -181,14 +181,7 @@ namespace LibraryManager.Controllers
                     Name = user.FirstName + " " + user.LastName
                 };
 
-                if (await _userManager.IsInRoleAsync(user, role.Name))
-                {
-                    userRoleViewModel.IsSelected = true;
-                }
-                else
-                {
-                    userRoleViewModel.IsSelected = false;
-                }
+                userRoleViewModel.IsSelected =await _administrationManager.IsInRoleAsync(user,role.Name);
 
                 model.Add(userRoleViewModel);
             }
@@ -209,7 +202,6 @@ namespace LibraryManager.Controllers
             for (int i = 0; i < model.Count; i++)
             {
                 var user = await _userManager.FindByIdAsync(model[i].EmployeeId);
-
                 IdentityResult result = null;
                 if (model[i].IsSelected && !(await _userManager.IsInRoleAsync(user, role.Name)))
                 {
@@ -320,14 +312,7 @@ namespace LibraryManager.Controllers
                     RoleName = role.Name
                 };
 
-                if (await _userManager.IsInRoleAsync(user, role.Name))
-                {
-                    userRolesVM.IsSelected = true;
-                }
-                else
-                {
-                    userRolesVM.IsSelected = false;
-                }
+                userRolesVM.IsSelected =await _administrationManager.IsInRoleAsync(user,role.Name);
 
                 model.Add(userRolesVM);
             }

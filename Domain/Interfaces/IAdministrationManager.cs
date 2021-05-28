@@ -12,5 +12,6 @@ namespace Domain.Interfaces
         Task<IdentityResult> EditRoleAsync(IdentityRole role);
         Task<IdentityResult> DeleteRoleAsync(IdentityRole role);
         Task<IdentityResult> UpdateInfoAsync(Employee entity);
+        Task<bool> IsInRoleAsync(Employee entity, string role);
     }
 }
