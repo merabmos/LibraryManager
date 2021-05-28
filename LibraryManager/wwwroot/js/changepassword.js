@@ -24,7 +24,9 @@
                         );
                     }
                 }
-            }
+            }, error: function (response) {
+                alert("Something Went wrong!");
+        }
         });
     });
 });

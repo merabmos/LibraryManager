@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace LibraryManager.Managers
 {
-    public class SectorManager : Repository<Sector>, ISectorManager
+    public class SectorManager : Repository<Sector>
     {
         private readonly IFilter<Sector> _filter;
         private readonly LibraryManagerDBContext _context;
@@ -43,7 +43,7 @@ namespace LibraryManager.Managers
                 : null;
 
 
-            var FilteredSectors = _filter.IntersectAllIfEmpty(sectors, GetByBetweenInsertDate, GetByCreators,
+            var FilteredSectors = _filter.Intersect(sectors, GetByBetweenInsertDate, GetByCreators,
                 GetByModifiers,
                 GetByBetweenModifyDate);
 

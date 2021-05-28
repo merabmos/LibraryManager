@@ -9,7 +9,7 @@ namespace Domain.Interfaces
 {
     public interface IFilter<T> where T : class
     {
-        IEnumerable<T> IntersectAllIfEmpty(params IEnumerable<T>[] lists);
+        IEnumerable<T> Intersect(params IEnumerable<T>[] lists);
         Task<List<T>> FilterInBetweenDates(string dateStart,
             string dateEnd, string propertyName, List<T> elements);
         Task<List<T>> GetListById(string Id, string PropertyName, List<T> Elements);

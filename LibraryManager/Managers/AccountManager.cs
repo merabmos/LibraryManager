@@ -4,26 +4,29 @@ using Domain.Interfaces;
 using LibraryManager.Validations.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using Validation.Models;
 
 namespace LibraryManager.Managers
 {
-    public class EmployeeManager : IEmployeeManager
+    public class AccountManager : IAccountManager
     {
         private readonly UserManager<Employee> _userManager;
         private readonly SignInManager<Employee> _signInManager;
         private readonly IMapper _mapper;
         private readonly IEmployeeValidation _employeeValidation;
+        private readonly RoleManager<IdentityRole> _roleManager;
 
-        public EmployeeManager(UserManager<Employee> userManager,
+        public AccountManager(UserManager<Employee> userManager,
             SignInManager<Employee> signInManager,
-            IMapper mapper, IEmployeeValidation employeeValidation)
+            IMapper mapper, IEmployeeValidation employeeValidation, RoleManager<IdentityRole> roleManager)
         {
             _userManager = userManager;
             _signInManager = signInManager;
             _mapper = mapper;
             _employeeValidation = employeeValidation;
+            _roleManager = roleManager;
         }
 
         public async Task LogOutAsync()
@@ -44,6 +47,7 @@ namespace LibraryManager.Managers
                 else
                     return null;
             }
+
             return null;
         }
 
@@ -70,6 +74,20 @@ namespace LibraryManager.Managers
                 var result = await _userManager.CreateAsync(entity, password);
                 if (result.Succeeded)
                 {
+                    if (_userManager.Users.Count() == 1)
+                    {
+                        if (_roleManager.Roles.Count() > 0)
+                        {
+                            await _userManager.AddToRoleAsync(entity, "Super Administrator");
+                        }
+                    }
+                    else
+                    {
+                        if (_roleManager.Roles.Count() > 0)
+                        {
+                            await _userManager.AddToRoleAsync(entity, "Administrator");
+                        }
+                    }
                     await _signInManager.SignInAsync(entity, true);
                     return null;
                 }

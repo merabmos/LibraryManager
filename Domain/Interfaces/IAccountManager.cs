@@ -8,13 +8,12 @@ using System.Threading.Tasks;
 
 namespace Domain.Interfaces
 {
-    public interface IEmployeeManager
+    public interface IAccountManager
     {
         Task<IdentityResult> RegisterAsync(Employee entity, string password);
         Task<SignInResult> LogInAsync(string username, string password);
         Task LogOutAsync();
         Task<IdentityResult> UpdateDetailsAsync(Employee entity);
         Task<IdentityResult> ChangePasswordAsync(Employee entity , string currentPassword,string newPassword);
-
     }
 }

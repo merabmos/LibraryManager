@@ -9,7 +9,7 @@ namespace LibraryManager.Managers.Main
 {
     public class Filter<T> : IFilter<T> where T : class
     {
-        public IEnumerable<T> IntersectAllIfEmpty(params IEnumerable<T>[] lists)
+        public IEnumerable<T> Intersect(params IEnumerable<T>[] lists)
         {
             IEnumerable<T> results = null;
 

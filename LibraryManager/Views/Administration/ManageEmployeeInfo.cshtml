@@ -1,0 +1,53 @@
+@model EmployeeVM
+@{
+    ViewData["Title"] = "ManageEmployeeInfo";
+    var employeeId = ViewBag.employeeId;
+}
+
+<h3>Manage @Model.FirstName @Model.LastName's Info</h3>
+<hr>
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="ManageEmployeeInfo" method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            @Html.HiddenFor(o => o.InsertDate)
+            @Html.HiddenFor(o => o.ModifyDate)
+            @Html.HiddenFor(o => o.Id)
+            @Html.HiddenFor(o => o.UserName)
+            <div class="form-group">
+                <h3>UserName :  @Model.UserName</h3>
+            </div>
+            <hr>
+            <div class="form-group">
+                <label asp-for="FirstName" class="control-label"></label>
+                <input asp-for="FirstName" class="form-control"/>
+                <span asp-validation-for="FirstName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="LastName" class="control-label"></label>
+                <input asp-for="LastName" class="form-control"/>
+                <span asp-validation-for="LastName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Age" class="control-label"></label>
+                <input asp-for="Age" class="form-control"/>
+                <span asp-validation-for="Age" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="PhoneNumber" class="control-label"></label>
+                <input asp-for="PhoneNumber" placeholder="Phone Numbers 5**-**-**-**" class="form-control"/>
+                <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+            </div>
+            <div class="row">
+            <input type="submit" value="Update" class="btn btn-primary"/>
+            <a asp-action="Employees"
+                           class="btn btn-primary" style="width:auto; margin-left:5px;">Cancel</a>
+            </div>
+
+            </form>
+    </div>
+</div>
+@section Scripts {
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+}

@@ -1,0 +1,46 @@
+@model List<EmployeeVM>
+@{
+    ViewData["Title"] = "Employees";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+<table class="table table-bordered table-responsive-lg table-dark table-hover table-striped">
+    <thead>
+    <tr >
+        <th colspan="3">
+            <h3 class="text-warning">Employees</h3>
+        </th>
+    </tr>
+    <tr>
+        <th>
+            @Html.DisplayNameFor(o => o[1].FirstName)
+        </th>
+        <th>
+            @Html.DisplayNameFor(o => o[1].LastName)
+        </th>
+        <th>
+            @Html.DisplayNameFor(o => o[1].Age)
+        </th>
+        <th>
+            @Html.DisplayNameFor(o => o[1].InsertDate)
+        </th>
+        <th>
+            Options
+        </th>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach (var record in Model)
+    {
+        <tr>
+            <td>@record.FirstName</td>
+            <td>@record.LastName</td>
+            <td>@record.Age</td>
+            <td>@record.InsertDate</td>
+            <td>
+                <a asp-action="ManageEmployeeRoles" asp-route-employeeId="@record.Id" class="text-light"> Manage Roles | </a>
+                <a asp-action="ManageEmployeeInfo" asp-route-employeeId="@record.Id" class="text-light"> Manage Info </a>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>

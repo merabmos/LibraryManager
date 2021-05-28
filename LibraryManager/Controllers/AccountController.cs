@@ -14,16 +14,16 @@ using System.Threading.Tasks;
 
 namespace LibraryManager.Controllers
 {
-    public class EmployeeController : Controller
+    public class AccountController : Controller
     {
         private readonly IMapper _mapper;
-        private readonly IEmployeeManager _employeeRepo;
+        private readonly IAccountManager _employeeRepo;
         private readonly SignInManager<Employee> _signInManager;
         private readonly UserManager<Employee> _userManager;
         private readonly IEmployeeValidation _employeeValidation;
         private readonly IRepository<Employee> _repository;
 
-        public EmployeeController(IMapper mapper, IEmployeeManager employeeRepo,
+        public AccountController(IMapper mapper, IAccountManager employeeRepo,
             SignInManager<Employee> signInManager, UserManager<Employee> userManager,
             IEmployeeValidation employeeValidation, IRepository<Employee> repository)
         {
@@ -33,15 +33,6 @@ namespace LibraryManager.Controllers
             _userManager = userManager;
             _employeeValidation = employeeValidation;
             _repository = repository;
-        }
-
-        public async Task<List<EmployeeVM>> SearchRecord(string search)
-        {
-            var user = await _userManager.FindByIdAsync(search);
-            var mapp = _mapper.Map<EmployeeVM>(user);
-            List<EmployeeVM> employees = new List<EmployeeVM>();
-            employees.Add(mapp);
-            return employees;
         }
 
         [Authorize]
@@ -206,7 +197,6 @@ namespace LibraryManager.Controllers
                 passwordVM.ValidationsMessage.Add("A problem has been fixed");
                 return passwordVM;
             }
-
         }
     }
 }

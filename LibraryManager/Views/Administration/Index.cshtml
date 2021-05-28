@@ -1,0 +1,24 @@
+﻿@model List<RoleVM>
+<a asp-controller="Administration" asp-action="Create" class="btn btn-outline-dark"> Create </a>
+<hr>
+<table class="table table-bordered table-responsive-lg">
+    <thead>
+    <tr>
+        <td> @Html.DisplayNameFor(o => o[0].Name)</td>
+        <td>Options</td>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td> @item.Name</td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.Id"> Edit</a>
+                <a asp-action="Delete" asp-route-id="@item.Id"> | Delete</a>
+                <a asp-action="Details" asp-route-id="@item.Id"> | Details</a>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>
