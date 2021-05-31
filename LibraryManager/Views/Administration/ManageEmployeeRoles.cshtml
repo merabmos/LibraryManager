@@ -1,7 +1,7 @@
 @model List<EmployeeRolesVM>
 @inject UserManager<Employee> _userManager;
 @{
-    ViewData["Title"] = "ManageEmployeeRoles";
+    ViewData["Title"] = "Manage Employee Roles";
     Layout = "~/Views/Shared/_Layout.cshtml";
     var employeeId = ViewBag.employeeId;
     var employee = await _userManager.FindByIdAsync(employeeId);

@@ -1,16 +1,13 @@
-﻿using Domain.Entities;
+﻿using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using LibraryManager.Models.SearchModels;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
 
-namespace LibraryManager.Models.SectorModels
+namespace LibraryManager.Models.SectionModels
 {
-    public class SectorVM : FilterVM
+    public class SectionVM : FilterVM
     {
+        
         public int Id { get; set; }
         public string Name { get; set; }
         public string InsertDate { get; set; }
@@ -19,10 +16,13 @@ namespace LibraryManager.Models.SectorModels
         public string CreatorEmployee { get; set; }
         [Display(Name = "Modifier Employee")]
         public string ModifierEmployee { get; set; }
-        
-        public List<SectorVM> Sectors { get; set; } = new List<SectorVM>();
+        public string Sector { get; set; }
+
+        public int SectorId { get; set; }
+
+        public List<SectionVM> Sections = new List<SectionVM>();
+        public List<SelectListItem> SectorsSelectList { get; set; } = new List<SelectListItem>();
         public List<SelectListItem> CreatorEmployeesSelectList { get; set; } = new List<SelectListItem>();
         public List<SelectListItem> ModifierEmployeesSelectList { get; set; } = new List<SelectListItem>();
-
     }
 }

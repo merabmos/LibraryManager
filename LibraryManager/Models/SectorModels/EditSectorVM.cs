@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace LibraryManager.Models.Sector
+namespace LibraryManager.Models.SectorModels
 {
     public class EditSectorVM
     {

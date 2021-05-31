@@ -39,6 +39,7 @@ namespace LibraryManager
             services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
             services.AddScoped(typeof(IFilter<>), typeof(Filter<>));
             services.AddScoped<SectorManager>();
+            services.AddScoped<SectionManager>();
             services.AddScoped<IAdministrationManager,AdministrationManager>();
 
 
