@@ -3,7 +3,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 using System.Threading.Tasks;
+using AutoMapper.Internal;
 
 namespace LibraryManager.Managers.Main
 {
@@ -33,21 +35,23 @@ namespace LibraryManager.Managers.Main
             return results;
         }
 
+
         public async Task<List<T>> FilterInBetweenDates(string dateStart,
             string dateEnd, string propertyName, List<T> elements)
         {
             await Task.Run(() => { });
             List<T> entities = new List<T>();
+           
             if (propertyName != null && elements.Count() > 0)
             {
-                if (dateStart.Count() == 0)
+                if (dateStart == null)
                     dateStart = DateTime.MinValue.ToString();
-                if (dateEnd.Count() == 0)
+                if (dateEnd == null)
                     dateEnd = DateTime.Now.ToString();
 
                 DateTime start = DateTime.Parse(dateStart);
                 DateTime end = DateTime.Parse(dateEnd);
-
+            
                 Func<T, bool> startDate = GreatThan(start, propertyName).Compile();
                 Func<T, bool> endDate = LessThan(end, propertyName).Compile();
                 foreach (var item in elements)
@@ -55,10 +59,7 @@ namespace LibraryManager.Managers.Main
                         entities.Add(item);
             }
 
-            if (entities.Count() != 0)
                 return entities;
-            else
-                return new List<T>();
         }
 
         public async Task<List<T>> GetListById(string Id, string PropertyName, List<T> Elements)
@@ -66,21 +67,34 @@ namespace LibraryManager.Managers.Main
             return await Task.Run(() =>
             {
                 List<T> entities = new List<T>();
-                if (Id.Count() != 0)
+                if (Id != null)
                 {
                     Func<T, bool> check = ExistOrNot(Id, PropertyName).Compile();
                     foreach (var item in Elements)
                         if (check(item))
                             entities.Add(item);
                 }
-
-                if (entities.Count() != 0)
                     return entities;
-                else
-                    return new List<T>();
+            });
+        }
+        
+        public async Task<List<T>> GetListById(int Id, string PropertyName, List<T> Elements)
+        {
+            return await Task.Run(() =>
+            {
+                List<T> entities = new List<T>();
+                if (Id != 0)
+                {
+                    Func<T, bool> check = ExistOrNot(Id, PropertyName).Compile();
+                    foreach (var item in Elements)
+                        if (check(item))
+                            entities.Add(item);
+                }
+                return entities;
             });
         }
 
+       
         public Expression<Func<T, bool>> ExistOrNot(object value, string dbEntityPropertyName)
         {
             ParameterExpression pe = Expression.Parameter(typeof(T), "Entity");

@@ -1,49 +1,58 @@
-﻿using AutoMapper;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using AutoMapper;
 using Domain.Entities;
 using Domain.Interfaces;
 using LibraryManager.Managers;
 using LibraryManager.Models.SearchModels;
-using LibraryManager.Models.SectorModels;
+using LibraryManager.Models.SectionModels;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using LibraryManager.Models.SectorModels;
-using Newtonsoft.Json;
 
 namespace LibraryManager.Controllers
 {
     [Authorize]
-    public class SectorController : Controller
+    public class SectionController : Controller
     {
-        private readonly IRepository<Sector> _repository;
+        private readonly IRepository<Section> _repository;
         private readonly IMapper _mapper;
         private readonly UserManager<Employee> _userManager;
         private readonly SectorManager _sectorManager;
+        private readonly SectionManager _sectionManager;
 
-        public SectorController(IRepository<Sector> repository, IMapper mappers,
-            UserManager<Employee> userManager, SectorManager sectorManager)
+        public SectionController(IRepository<Section> repository, IMapper mapper,
+            UserManager<Employee> userManager, SectorManager sectorManager, SectionManager sectionManager)
         {
-            _repository = repository;
-            _mapper = mappers;
-            _userManager = userManager;
+         
+            _mapper = mapper;
             _sectorManager = sectorManager;
+            _sectionManager = sectionManager;
+            _userManager = userManager;
+            _repository = repository;
         }
 
-        [HttpPost]
-        public async Task<ActionResult> Index(SectorVM request)
+        [HttpGet]
+        public IActionResult Index()
         {
-            var data = await _sectorManager.FilterAsync(request);
-            List<SectorVM> sectors = new List<SectorVM>();
-
+            SectionVM sectionVm = new SectionVM();
+            sectionVm.CreatorEmployeesSelectList.AddRange(_repository.GetEmployeesSelectList());
+            sectionVm.ModifierEmployeesSelectList.AddRange(_repository.GetEmployeesSelectList());
+            sectionVm.SectorsSelectList.AddRange(_sectorManager.GetSectorsSelectList());
+         
+            return View(sectionVm);
+        }
+        
+        [HttpPost]
+        public async Task<IActionResult> Index(SectionVM request)
+        {
+            var data = await _sectionManager.FilterAsync(request);
+            List<SectionVM> section = new List<SectionVM>();
             foreach (var item in data)
             {
-                var mapp = _mapper.Map<SectorVM>(item);
+                var mapp = _mapper.Map<SectionVM>(item);
 
                 if (item.CreatorId != null)
                 {
@@ -56,42 +65,41 @@ namespace LibraryManager.Controllers
                     var modifierEmployee = await _userManager.FindByIdAsync(item.ModifierId);
                     mapp.ModifierEmployee = modifierEmployee.FirstName + " " + modifierEmployee.LastName;
                 }
+                
+                if (item.SectorId != null)
+                {
+                    var sector =  await _sectorManager.GetSectorById(item.SectorId);
+                    if (sector != null)
+                        mapp.Sector = sector.Name;
+                }
+                
                 else
                     mapp.ModifierEmployee = "";
 
-                sectors.Add(mapp);
+                section.Add(mapp);
             }
-
-            request = new SectorVM();
-            request.Sectors.AddRange(sectors);
+            
+            request.Sections.AddRange(section);
             request.CreatorEmployeesSelectList.AddRange(_repository.GetEmployeesSelectList());
             request.ModifierEmployeesSelectList.AddRange(_repository.GetEmployeesSelectList());
+            request.SectorsSelectList.AddRange(_sectorManager.GetSectorsSelectList());
             return View(request);
         }
-
-        // GET: SectorController 
-        [HttpGet]
-        public ActionResult Index()
-        {
-            SectorVM sectorVM = new SectorVM();
-            sectorVM.CreatorEmployeesSelectList.AddRange(_repository.GetEmployeesSelectList());
-            sectorVM.ModifierEmployeesSelectList.AddRange(_repository.GetEmployeesSelectList());
-
-            return View(sectorVM);
-        }
-
+        
         // GET: SectorController/Create
         public ActionResult Create()
         {
-            return View();
+            CreateSectionVM csVM = new CreateSectionVM();
+            csVM.SectorsSelectList.AddRange(_sectorManager.GetSectorsSelectList());
+            return View(csVM);
         }
 
         // POST: SectorController/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Create(CreateSectorVM model)
+        public async Task<ActionResult> Create(CreateSectionVM model)
         {
-            var data = await _sectorManager.FindBySearchAsync(model.Name);
+            var data = await _sectionManager.FindBySearchAsync(model.Name);
             if (data.Count() != 0)
             {
                 foreach (var item in data)
@@ -99,6 +107,7 @@ namespace LibraryManager.Controllers
                     if (item.DeleteDate != null)
                     {
                         item.InsertDate = DateTime.Now;
+                        item.SectorId = model.SectorId;
                         item.CreatorId = _userManager.GetUserId(User);
                         item.DeleteDate = null;
                         _repository.Update(item);
@@ -112,7 +121,7 @@ namespace LibraryManager.Controllers
             }
             else
             {
-                var mapp = _mapper.Map<Sector>(model);
+                var mapp = _mapper.Map<Section>(model);
                 mapp.CreatorId = _userManager.GetUserId(User);
                 _repository.Insert(mapp);
                 return RedirectToAction("Create");
@@ -120,16 +129,16 @@ namespace LibraryManager.Controllers
 
             return RedirectToAction("Create");
         }
-
-        // GET: SectorController/Edit/5
+        
         public ActionResult Edit(int Id)
         {
             if (Id != 0)
             {
-                var sector = _repository.GetById(Id);
-                if (sector != null)
+                var entity = _repository.GetById(Id);
+                if (entity != null)
                 {
-                    var map = _mapper.Map<EditSectorVM>(sector);
+                    var map = _mapper.Map<EditSectionVM>(entity);
+                    map.SectorsSelectList.AddRange(_sectorManager.GetSectorsSelectList());
                     return View(map);
                 }
             }
@@ -137,12 +146,11 @@ namespace LibraryManager.Controllers
             return RedirectToAction("Index");
         }
 
-        // POST: SectorController/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Edit(EditSectorVM model)
+        public async Task<ActionResult> Edit(EditSectionVM model)
         {
-            var data = await _sectorManager.FindBySearchAsync(model.Name);
+            var data = await _sectionManager.FindBySearchAsync(model.Name);
             if (data.Count() != 0)
             {
                 foreach (var item in data)
@@ -151,6 +159,7 @@ namespace LibraryManager.Controllers
                     {
                         item.Name = model.Name;
                         item.ModifierId = _userManager.GetUserId(User);
+                        item.SectorId = model.SectorId;
                         item.ModifyDate = DateTime.Now;
                         _repository.Update(item);
                     }
@@ -163,22 +172,22 @@ namespace LibraryManager.Controllers
             }
             else
             {
-                var sector = _repository.GetById(model.Id);
-                sector.Name = model.Name;
-                sector.ModifierId = _userManager.GetUserId(User);
-                sector.ModifyDate = DateTime.Now;
-                _repository.Update(sector);
-                return RedirectToAction("Index", "Sector");
+                var entity = _repository.GetById(model.Id);
+                entity.Name = model.Name;
+                entity.ModifierId = _userManager.GetUserId(User);
+                entity.SectorId = model.SectorId;
+                entity.ModifyDate = DateTime.Now;
+                _repository.Update(entity);
+                return RedirectToAction("Index");
             }
-
-            return RedirectToAction("Index", "Sector");
+            return RedirectToAction("Index");
         }
-
+        
         [HttpGet]
         public async Task<ActionResult> Delete(int Id)
         {
-            await _sectorManager.DeleteAsync(Id);
-            return RedirectToAction("Index", "Sector");
+            await _sectionManager.DeleteAsync(Id);
+            return RedirectToAction("Index");
         }
     }
 }

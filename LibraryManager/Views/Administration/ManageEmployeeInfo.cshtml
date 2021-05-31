@@ -1,7 +1,7 @@
 @model EmployeeVM
 @{
-    ViewData["Title"] = "ManageEmployeeInfo";
-    var employeeId = ViewBag.employeeId;
+    ViewBag.Title = "Manage Employee Info";
+    Layout = "~/Views/Shared/_Layout.cshtml";
 }
 
 <h3>Manage @Model.FirstName @Model.LastName's Info</h3>
@@ -14,10 +14,6 @@
             @Html.HiddenFor(o => o.ModifyDate)
             @Html.HiddenFor(o => o.Id)
             @Html.HiddenFor(o => o.UserName)
-            <div class="form-group">
-                <h3>UserName :  @Model.UserName</h3>
-            </div>
-            <hr>
             <div class="form-group">
                 <label asp-for="FirstName" class="control-label"></label>
                 <input asp-for="FirstName" class="form-control"/>

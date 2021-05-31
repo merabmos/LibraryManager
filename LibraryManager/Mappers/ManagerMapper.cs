@@ -1,11 +1,13 @@
 ﻿using AutoMapper;
 using Domain.Entities;
 using LibraryManager.Models.EmployeeModels;
-using LibraryManager.Models.Sector;
+using LibraryManager.Models.SectorModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using LibraryManager.Models.SectionModels;
+using LibraryManager.Models.SectorModels;
 
 namespace LibraryManager.Mappers
 {
@@ -13,18 +15,31 @@ namespace LibraryManager.Mappers
     {
         public ManagerMapper()
         {
+            
+            //EMPLOYEE
             CreateMap<EmployeeVM, Employee>();
             CreateMap<Employee, EmployeeVM>();
             CreateMap<RegisterVM, Employee>();
             CreateMap<Employee, RegisterVM>();
             CreateMap<DetailsVM, Employee>();
             CreateMap<Employee, DetailsVM>();
+         
+            //SECTOR
             CreateMap<Sector,CreateSectorVM>();
             CreateMap<CreateSectorVM, Sector>();
             CreateMap<Sector, SectorVM>();
             CreateMap<SectorVM, Sector>();
             CreateMap<Sector, EditSectorVM>();
             CreateMap<EditSectorVM, Sector>();
+            
+            //SECTION
+            CreateMap<Section, SectionVM>();
+            CreateMap<SectionVM, Section>();
+            CreateMap<CreateSectionVM,Section>();
+            CreateMap<Section, CreateSectionVM>();
+            CreateMap<EditSectionVM,Section>();
+            CreateMap<Section, EditSectionVM>();
+            
         }
     }
 }

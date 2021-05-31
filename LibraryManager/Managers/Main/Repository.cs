@@ -10,6 +10,7 @@ using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace LibraryManager.Managers.Main
 {
@@ -66,7 +67,7 @@ namespace LibraryManager.Managers.Main
                 table.Remove(existing);
             }
         }
-
+        
         public List<SelectListItem> GetEmployeesSelectList()
         {
             var users = _userManager.Users;
