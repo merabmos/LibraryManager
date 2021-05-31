@@ -64,9 +64,9 @@ namespace LibraryManager.Controllers
         [HttpGet]
         public IActionResult LogIn()
         {
-            if (_signInManager.IsSignedIn(User))
-                return RedirectToAction("Index", "Home");
-            return View();
+            if (!_signInManager.IsSignedIn(User))
+                return View();
+            return RedirectToAction("Index", "Home");
         }
 
         [HttpPost]
