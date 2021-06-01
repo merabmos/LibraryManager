@@ -29,7 +29,6 @@ namespace LibraryManager.Managers
         public async Task<List<Sector>> FilterAsync(SectorVM filter)
         {
             var sectors = _context.Sectors.Where(o => o.DeleteDate == null).ToList();
-
             #region Commented
 
             /*var GetPropertiesWithId = typeof(FilterVM).GetProperties().Where(o => o.Name.EndsWith("Id")).ToList();
@@ -42,12 +41,11 @@ namespace LibraryManager.Managers
             }*/
 
             #endregion
-
             List<Sector> GetByCreators = filter.CreatorId != null
-                ? await _filter.GetListById(filter.CreatorId, "CreatorId", sectors)
+                ? await _filter.GetListBy(filter.CreatorId, "CreatorId", sectors)
                 : null;
             List<Sector> GetByModifiers = filter.ModifierId != null
-                ? await _filter.GetListById(filter.ModifierId, "ModifierId", sectors)
+                ? await _filter.GetListBy(filter.ModifierId, "ModifierId", sectors)
                 : null;
 
             List<Sector> GetByBetweenInsertDate = filter.InsertStartDate != null || filter.InsertEndDate != null
@@ -62,16 +60,9 @@ namespace LibraryManager.Managers
 
             var FilteredSectors = _filter.Intersect(sectors, GetByBetweenInsertDate, GetByCreators,
                 GetByModifiers,
-                GetByBetweenModifyDate);
+                GetByBetweenModifyDate).ToList();
 
-            sectors = new List<Sector>();
-
-            foreach (var item in FilteredSectors)
-            {
-                sectors.Add(item);
-            }
-
-            return sectors;
+            return FilteredSectors;
         }
 
         public async Task<Sector> GetSectorById(int? id)

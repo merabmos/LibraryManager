@@ -34,8 +34,7 @@ namespace LibraryManager.Managers.Main
 
             return results;
         }
-
-
+        
         public async Task<List<T>> FilterInBetweenDates(string dateStart,
             string dateEnd, string propertyName, List<T> elements)
         {
@@ -62,14 +61,14 @@ namespace LibraryManager.Managers.Main
                 return entities;
         }
 
-        public async Task<List<T>> GetListById(string Id, string PropertyName, List<T> Elements)
+        public async Task<List<T>> GetListBy(object o, string PropertyName, List<T> Elements)
         {
             return await Task.Run(() =>
             {
                 List<T> entities = new List<T>();
-                if (Id != null)
+                if (o != null)
                 {
-                    Func<T, bool> check = ExistOrNot(Id, PropertyName).Compile();
+                    Func<T, bool> check = ExistOrNot(o, PropertyName).Compile();
                     foreach (var item in Elements)
                         if (check(item))
                             entities.Add(item);

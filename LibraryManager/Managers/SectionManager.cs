@@ -31,11 +31,11 @@ namespace LibraryManager.Managers
                 : null;
             
             List<Section> GetByCreators = filter.CreatorId != null
-                ? await _filter.GetListById(filter.CreatorId, "CreatorId", sections)
+                ? await _filter.GetListBy(filter.CreatorId, "CreatorId", sections)
                 : null;
             
             List<Section> GetByModifiers = filter.ModifierId != null
-                ? await _filter.GetListById(filter.ModifierId, "ModifierId", sections)
+                ? await _filter.GetListBy(filter.ModifierId, "ModifierId", sections)
                 : null;
 
             List<Section> GetByBetweenInsertDate = filter.InsertStartDate != null || filter.InsertEndDate != null
@@ -63,15 +63,21 @@ namespace LibraryManager.Managers
             return sections;
         }
         
-        
-        public async Task<List<Section>> FindBySearchAsync(object search)
+        public async Task<List<Section>> FilterTableByAsync(object obj,string columnInTable)
         {
-            return await Task.Run(() =>
-            {
-                // && o.DeleteDate == null
-                return _context.Sections.Where(o => o.Name.Contains((string) search)).ToList();
-            });
+            var sections = _context.Sections.ToList();
+            List<Section> GetBySectors = obj != null
+                ? await _filter.GetListBy(obj,columnInTable, sections)
+                : null;
+            return GetBySectors;
         }
+
+        public List<Section> FilterLists(params IEnumerable<Section>[] lists)
+        {
+            var FilteredSections = _filter.Intersect(lists).ToList();
+            return FilteredSections;
+        }
+
         public override async Task DeleteAsync(object id)
         {
             var section = await _context.Sections.FindAsync(id);
