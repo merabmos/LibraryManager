@@ -87,32 +87,20 @@ namespace LibraryManager.Controllers
         public async Task<ActionResult> Create(CreateSectorVM model)
         {
             var data = await _sectorManager.FindBySearchAsync(model.Name);
-            if (data.Count() != 0)
-            {
+            if (data.Any())
                 foreach (var item in data)
-                {
                     if (item.DeleteDate != null)
-                    {
-                        item.InsertDate = DateTime.Now;
-                        item.CreatorId = _userManager.GetUserId(User);
-                        item.DeleteDate = null;
-                        _repository.Update(item);
-                    }
+                        _repository.Delete(item);
                     else
                     {
-                        ModelState.AddModelError("", "this name already exists");
+                        ModelState.AddModelError("", "This name already exists");
                         return View(model);
                     }
-                }
-            }
-            else
-            {
-                var mapp = _mapper.Map<Sector>(model);
-                mapp.CreatorId = _userManager.GetUserId(User);
-                _repository.Insert(mapp);
-                return RedirectToAction("Create");
-            }
-
+               
+            var map = _mapper.Map<Sector>(model);
+            map.InsertDate = DateTime.Now;
+            map.CreatorId = _userManager.GetUserId(User);
+            _repository.Insert(map);
             return RedirectToAction("Create");
         }
 
@@ -132,19 +120,33 @@ namespace LibraryManager.Controllers
             return RedirectToAction("Index");
         }
 
-        // POST: SectorController/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Edit(EditSectorVM model)
         {
             var data = await _sectorManager.FindBySearchAsync(model.Name);
+            if (data.Any())
+                foreach (var item in data)
+                    if (item.DeleteDate != null)
+                        _repository.Delete(item);
+                    else
+                    {
+                        ModelState.AddModelError("", "This Name already exists");
+                        return View(model);
+                    }
+            
+            var entity = _repository.GetById(model.Id);
+            var map = _mapper.Map(model, entity);
+            map.ModifyDate = DateTime.Now;
+            map.ModifierId = _userManager.GetUserId(User);
+            _repository.Update(map);
             return RedirectToAction("Index");
         }
 
         [HttpGet]
-        public  ActionResult Delete(int Id)
+        public async Task<ActionResult> Delete(int Id)
         {
-            _repository.DeleteById(Id);
+            await _sectorManager.RemoveByIdAsync(Id);
             return RedirectToAction("Index");
         }
     }

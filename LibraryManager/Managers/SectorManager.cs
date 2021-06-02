@@ -14,12 +14,12 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace LibraryManager.Managers
 {
-    public class SectorManager : Repository<Sector>
+    public class SectorManager
     {
         private readonly IFilter<Sector> _filter;
         private readonly LibraryManagerDBContext _context;
 
-        public SectorManager(LibraryManagerDBContext context, IFilter<Sector> filter) : base(context)
+        public SectorManager(LibraryManagerDBContext context, IFilter<Sector> filter)
         {
             _context = context;
             _filter = filter;
@@ -114,12 +114,12 @@ namespace LibraryManager.Managers
         
         public async Task RemoveByIdAsync(object id)
         {
-            var sector =  await _context.Sectors.FindAsync(id);
-            if (sector != null)
+            var section =  await _context.Sections.FindAsync(id);
+            if (section != null)
             {
-                sector.DeleteDate = DateTime.Now;
-                Update(sector);
-                 await _context.SaveChangesAsync();
+                section.DeleteDate = DateTime.Now;
+                _context.Sections.Update(section);
+                await _context.SaveChangesAsync();
             }
         }
     }
