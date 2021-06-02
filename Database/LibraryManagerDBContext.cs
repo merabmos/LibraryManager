@@ -44,7 +44,8 @@ namespace Database
             modelBuilder.ApplyConfiguration(new SectionConfig());
             modelBuilder.ApplyConfiguration(new SectorConfig());
             modelBuilder.ApplyConfiguration(new EmployeeConfig());
-
+            modelBuilder.ApplyConfiguration(new RoleConfig());
+            
             OnModelCreatingPartial(modelBuilder);
         }
 

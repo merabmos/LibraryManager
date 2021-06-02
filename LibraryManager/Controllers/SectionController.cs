@@ -90,7 +90,7 @@ namespace LibraryManager.Controllers
         {
             CreateSectionVM csVM = new CreateSectionVM();
             csVM.SectorsSelectList.AddRange(_sectorManager.GetSectorsSelectList());
-            
+
             return View(csVM);
         }
 
@@ -102,23 +102,24 @@ namespace LibraryManager.Controllers
             var filterbyname = await _sectionManager.FilterTableByAsync(model.Name, "Name");
             var filterbysector = await _sectionManager.FilterTableByAsync(model.SectorId, "SectorId");
             var filterbyLists = _sectionManager.FilterLists(filterbyname, filterbysector);
-    
-            if (filterbyLists.Count() > 0)
-            {
-                foreach(var item in filterbyLists){
 
-               if(item.DeleteDate != null)
-               {
-
-               }     
-            } 
-
-            }
-            else
-            {
-                var map = _mapper.Map<Section>(model);
+      
+            if (filterbyLists.Any())
+                foreach (var item in filterbyLists)
+                    if (item.DeleteDate != null)
+                        _repository.Delete(item);
+                    else
+                    {
+                        ModelState.AddModelError("", "This type already exists");
+                        model.SectorsSelectList.AddRange(_sectorManager.GetSectorsSelectList());
+                        return View(model);
+                    }
+               
+            var map = _mapper.Map<Section>(model);
                 map.InsertDate = DateTime.Now;
-            }
+                map.CreatorId = _userManager.GetUserId(User);
+                _repository.Insert(map);
+
             return RedirectToAction("Create");
         }
 
@@ -145,14 +146,30 @@ namespace LibraryManager.Controllers
             var filterbyname = await _sectionManager.FilterTableByAsync(model.Name, "Name");
             var filterbysector = await _sectionManager.FilterTableByAsync(model.SectorId, "SectorId");
             var filterbyLists = _sectionManager.FilterLists(filterbyname, filterbysector);
-           
+
+            if (filterbyLists.Any())
+                foreach (var item in filterbyLists)
+                    if (item.DeleteDate != null)
+                        _repository.Delete(item);
+                    else
+                    {
+                        ModelState.AddModelError("", "This type already exists");
+                        model.SectorsSelectList.AddRange(_sectorManager.GetSectorsSelectList());
+                        return View(model);
+                    }
+            
+            var entity = _repository.GetById(model.Id);
+            var map = _mapper.Map(model, entity);
+            map.ModifierId = _userManager.GetUserId(User);
+            map.ModifyDate = DateTime.Now;
+            _repository.Update(map);
             return RedirectToAction("Index");
         }
 
         [HttpGet]
         public async Task<ActionResult> Delete(int Id)
         {
-            await _sectionManager.DeleteAsync(Id);
+            await _sectionManager.RemoveByIdAsync(Id); 
             return RedirectToAction("Index");
         }
     }

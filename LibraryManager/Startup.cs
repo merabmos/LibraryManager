@@ -54,7 +54,7 @@ namespace LibraryManager
             })
             .AddEntityFrameworkStores<LibraryManagerDBContext>()
             .AddDefaultTokenProviders();
-
+            
             var mapperConfig = new MapperConfiguration(mc =>
             {
                 mc.AddProfile(new ManagerMapper());

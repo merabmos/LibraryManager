@@ -4,14 +4,16 @@ using Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Database.Migrations
 {
     [DbContext(typeof(LibraryManagerDBContext))]
-    partial class LibraryManagerDBContextModelSnapshot : ModelSnapshot
+    [Migration("20210602123640_Update")]
+    partial class Update
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -632,17 +634,15 @@ namespace Database.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "b92b976b-ed54-499a-a125-4c2898365079",
-                            ConcurrencyStamp = "c13c1f51-23a4-40b8-a405-f1bbabb3f6e4",
-                            Name = "Super Administrator",
-                            NormalizedName = "SUPER ADMINISTRATOR"
+                            Id = "4323f38f-cf58-4783-a7f2-03f1f5496055",
+                            ConcurrencyStamp = "b8f9d52d-8fcf-468e-bca1-1433e2d94192",
+                            Name = "Super Administrator"
                         },
                         new
                         {
-                            Id = "5001f34e-17f0-4e5e-922f-38bd9c2ad862",
-                            ConcurrencyStamp = "8500c715-5f8b-4f36-aa75-8215caa7d005",
-                            Name = "Administrator",
-                            NormalizedName = "ADMINISTRATOR"
+                            Id = "39129d89-2588-4bff-aa07-12516c83d3ed",
+                            ConcurrencyStamp = "e519cf7e-7635-45c2-ba67-c10b53d62f41",
+                            Name = "Administrator"
                         });
                 });
 

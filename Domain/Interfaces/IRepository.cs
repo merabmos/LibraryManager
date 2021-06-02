@@ -12,7 +12,8 @@ namespace Domain.Interfaces
         T GetById(object id);
         void Insert(T obj);
         void Update(T obj);
-        Task DeleteAsync(object id);
+        void Delete(T entity);
+        void DeleteById(object Id);
         void Save();
         List<SelectListItem> GetEmployeesSelectList();
     }

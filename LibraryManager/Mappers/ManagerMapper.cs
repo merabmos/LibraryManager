@@ -2,12 +2,7 @@
 using Domain.Entities;
 using LibraryManager.Models.EmployeeModels;
 using LibraryManager.Models.SectorModels;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using LibraryManager.Models.SectionModels;
-using LibraryManager.Models.SectorModels;
 
 namespace LibraryManager.Mappers
 {
@@ -15,7 +10,6 @@ namespace LibraryManager.Mappers
     {
         public ManagerMapper()
         {
-            
             //EMPLOYEE
             CreateMap<EmployeeVM, Employee>();
             CreateMap<Employee, EmployeeVM>();
@@ -39,7 +33,6 @@ namespace LibraryManager.Mappers
             CreateMap<Section, CreateSectionVM>();
             CreateMap<EditSectionVM,Section>();
             CreateMap<Section, EditSectionVM>();
-            
         }
     }
 }

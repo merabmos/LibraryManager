@@ -76,14 +76,14 @@ namespace LibraryManager.Managers
                 {
                     if (_userManager.Users.Count() == 1)
                     {
-                        if (_roleManager.Roles.Count() > 0)
+                        if (_roleManager.Roles.Any())
                         {
                             await _userManager.AddToRoleAsync(entity, "Super Administrator");
                         }
                     }
                     else
                     {
-                        if (_roleManager.Roles.Count() > 0)
+                        if (_roleManager.Roles.Any())
                         {
                             await _userManager.AddToRoleAsync(entity, "Administrator");
                         }

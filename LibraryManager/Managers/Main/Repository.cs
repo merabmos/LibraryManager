@@ -58,14 +58,19 @@ namespace LibraryManager.Managers.Main
                 Save();
             }
         }
-
-        public virtual async Task DeleteAsync(object id)
+        public virtual void DeleteById(object Id)
         {
-            T existing = await table.FindAsync(id);
-            if (existing != null)
+            var entity = GetById(Id);
+            if (entity != null)
             {
-                table.Remove(existing);
+                table.Remove(entity);
+                Save();
             }
+        }
+        public  void Delete(T existing)
+        {
+            table.Remove(existing);
+            Save();
         }
         
         public List<SelectListItem> GetEmployeesSelectList()
@@ -86,6 +91,5 @@ namespace LibraryManager.Managers.Main
         {
             _context.SaveChanges();
         }
-      
     }
 }

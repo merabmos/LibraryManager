@@ -72,20 +72,23 @@ namespace LibraryManager.Managers
             return GetBySectors;
         }
 
+         //Update delete time       
+        public async Task RemoveByIdAsync(object id)
+        {
+            var section =  await _context.Sections.FindAsync(id);
+            if (section != null)
+            {
+                section.DeleteDate = DateTime.Now;
+                _context.Sections.Update(section);
+                await _context.SaveChangesAsync();
+            }
+        }
+        
         public List<Section> FilterLists(params IEnumerable<Section>[] lists)
         {
             var FilteredSections = _filter.Intersect(lists).ToList();
             return FilteredSections;
         }
 
-        public override async Task DeleteAsync(object id)
-        {
-            var section = await _context.Sections.FindAsync(id);
-            if (section != null)
-            {
-                section.DeleteDate = DateTime.Now;
-                await _context.SaveChangesAsync();
-            }
-        }
     }
 }

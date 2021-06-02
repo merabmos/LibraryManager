@@ -112,13 +112,14 @@ namespace LibraryManager.Managers
             return employeeSelectList;
         }
         
-        public override async Task DeleteAsync(object id)
+        public async Task RemoveByIdAsync(object id)
         {
-            var sector = await _context.Sectors.FindAsync(id);
+            var sector =  await _context.Sectors.FindAsync(id);
             if (sector != null)
             {
                 sector.DeleteDate = DateTime.Now;
-                await _context.SaveChangesAsync();
+                Update(sector);
+                 await _context.SaveChangesAsync();
             }
         }
     }

@@ -2,19 +2,14 @@
 using Domain.Entities;
 using Domain.Interfaces;
 using LibraryManager.Managers;
-using LibraryManager.Models.SearchModels;
 using LibraryManager.Models.SectorModels;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using LibraryManager.Models.SectorModels;
-using Newtonsoft.Json;
 
 namespace LibraryManager.Controllers
 {
@@ -143,42 +138,14 @@ namespace LibraryManager.Controllers
         public async Task<ActionResult> Edit(EditSectorVM model)
         {
             var data = await _sectorManager.FindBySearchAsync(model.Name);
-            if (data.Count() != 0)
-            {
-                foreach (var item in data)
-                {
-                    if (item.DeleteDate == null && item.Id == model.Id)
-                    {
-                        item.Name = model.Name;
-                        item.ModifierId = _userManager.GetUserId(User);
-                        item.ModifyDate = DateTime.Now;
-                        _repository.Update(item);
-                    }
-                    else
-                    {
-                        ModelState.AddModelError("", "this name already exists");
-                        return View(model);
-                    }
-                }
-            }
-            else
-            {
-                var sector = _repository.GetById(model.Id);
-                sector.Name = model.Name;
-                sector.ModifierId = _userManager.GetUserId(User);
-                sector.ModifyDate = DateTime.Now;
-                _repository.Update(sector);
-                return RedirectToAction("Index", "Sector");
-            }
-
-            return RedirectToAction("Index", "Sector");
+            return RedirectToAction("Index");
         }
 
         [HttpGet]
-        public async Task<ActionResult> Delete(int Id)
+        public  ActionResult Delete(int Id)
         {
-            await _sectorManager.DeleteAsync(Id);
-            return RedirectToAction("Index", "Sector");
+            _repository.DeleteById(Id);
+            return RedirectToAction("Index");
         }
     }
 }
