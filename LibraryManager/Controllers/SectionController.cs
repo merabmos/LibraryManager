@@ -103,6 +103,22 @@ namespace LibraryManager.Controllers
             var filterbysector = await _sectionManager.FilterTableByAsync(model.SectorId, "SectorId");
             var filterbyLists = _sectionManager.FilterLists(filterbyname, filterbysector);
     
+            if (filterbyLists.Count() > 0)
+            {
+                foreach(var item in filterbyLists){
+
+               if(item.DeleteDate != null)
+               {
+
+               }     
+            } 
+
+            }
+            else
+            {
+                var map = _mapper.Map<Section>(model);
+                map.InsertDate = DateTime.Now;
+            }
             return RedirectToAction("Create");
         }
 
