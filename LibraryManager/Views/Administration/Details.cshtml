@@ -2,22 +2,15 @@
 @{
     ViewData["Title"] = "Details";
     Layout = "~/Views/Shared/_Layout.cshtml";
-}
-
-@{
     var roleId = ViewBag.roleId;
     var role = ViewBag.role;
-
 }
-<h3>Role Id : @roleId</h3>
-<hr>
-<h3>Role : @role </h3>
 <a asp-action="Edit" asp-route-id="@roleId" class="btn btn-outline-light"> Edit</a>
 
 <form asp-action="Details" method="post">
     <div class="card">
         <div class="card-header">
-            <h2>Add or remove users from this role</h2>
+            <h2>Add or remove users from @role</h2>
         </div>
         <div class="card-body">
             @for (int i = 0; i < Model.Count; i++)
