@@ -14,6 +14,7 @@ namespace Domain.Entities
 
         public int Id { get; set; }
         public int? SectionId { get; set; }
+        public int? SectorId { get; set; }
         public string Name { get; set; }
         public string CreatorId { get; set; }
         public string ModifierId { get; set; }
@@ -21,6 +22,7 @@ namespace Domain.Entities
         public DateTime? ModifyDate { get; set; }
         public DateTime? DeleteDate { get; set; }
 
+        public virtual Sector Sector { get; set; }
         public virtual Section Section { get; set; }
         public virtual ICollection<BooksShelvesBook> BooksShelvesBooks { get; set; }
     }
