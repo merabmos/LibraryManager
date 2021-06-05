@@ -109,7 +109,7 @@ namespace LibraryManager.Controllers
         {
             if (Id != 0)
             {
-                var sector = _repository.GetById(Id);
+                var sector = _repository.GetByIdAsync(Id);
                 if (sector != null)
                 {
                     var map = _mapper.Map<EditSectorVM>(sector);
@@ -135,7 +135,7 @@ namespace LibraryManager.Controllers
                         return View(model);
                     }
             
-            var entity = _repository.GetById(model.Id);
+            var entity = _repository.GetByIdAsync(model.Id);
             var map = _mapper.Map(model, entity);
             map.ModifyDate = DateTime.Now;
             map.ModifierId = _userManager.GetUserId(User);

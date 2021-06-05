@@ -33,7 +33,7 @@ namespace LibraryManager.Controllers
         // GET: Role
         public AdministrationController(RoleManager<IdentityRole> roleManager,
             IAdministrationManager administrationManager, UserManager<Employee> userManager, IMapper mapper,
-             IAccountManager accountManager)
+            IAccountManager accountManager)
         {
             _roleManager = roleManager;
             _administrationManager = administrationManager;
@@ -178,10 +178,10 @@ namespace LibraryManager.Controllers
                 var userRoleViewModel = new EmployeeRoleVM
                 {
                     EmployeeId = user.Id,
-                    Name = user.FirstName + " " + user.LastName
+                    Name = user.FirstName + " " + user.LastName,
+                    IsSelected = await _administrationManager.IsInRoleAsync(user, role.Name)
                 };
 
-                userRoleViewModel.IsSelected =await _administrationManager.IsInRoleAsync(user,role.Name);
 
                 model.Add(userRoleViewModel);
             }
@@ -232,7 +232,7 @@ namespace LibraryManager.Controllers
         {
             var employees = _userManager.Users.Where(o => o.Id != _userManager.GetUserId(User)).ToList();
             var employeesVM = new List<EmployeeVM>();
-            if (employees.Count() > 0)
+            if (employees.Any())
             {
                 foreach (var record in employees)
                 {
@@ -242,10 +242,8 @@ namespace LibraryManager.Controllers
 
                 return View(employeesVM);
             }
-            else
-            {
-                return View(employeesVM);
-            }
+
+            return View(employeesVM);
         }
 
         [HttpGet]
@@ -283,10 +281,11 @@ namespace LibraryManager.Controllers
                 {
                     foreach (var error in result.Errors)
                     {
-                        ModelState.AddModelError("",error.Description);
+                        ModelState.AddModelError("", error.Description);
                     }
                 }
             }
+
             return View(model);
         }
 
@@ -303,7 +302,7 @@ namespace LibraryManager.Controllers
             }
 
             var model = new List<EmployeeRolesVM>();
-            
+
             foreach (var role in _roleManager.Roles)
             {
                 var userRolesVM = new EmployeeRolesVM()
@@ -312,7 +311,7 @@ namespace LibraryManager.Controllers
                     RoleName = role.Name
                 };
 
-                userRolesVM.IsSelected =await _administrationManager.IsInRoleAsync(user,role.Name);
+                userRolesVM.IsSelected = await _administrationManager.IsInRoleAsync(user, role.Name);
 
                 model.Add(userRolesVM);
             }

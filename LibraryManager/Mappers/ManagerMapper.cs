@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Domain.Entities;
+using LibraryManager.Models.BooksShelfModels;
 using LibraryManager.Models.EmployeeModels;
 using LibraryManager.Models.SectorModels;
 using LibraryManager.Models.SectionModels;
@@ -33,6 +34,12 @@ namespace LibraryManager.Mappers
             CreateMap<Section, CreateSectionVM>();
             CreateMap<EditSectionVM,Section>();
             CreateMap<Section, EditSectionVM>();
+            
+            //BOOKS SHELF
+            CreateMap<BooksShelf, BooksShelfVM>();
+            CreateMap<BooksShelfVM, BooksShelf>();
+            CreateMap<CreateBooksShelfVM,BooksShelf>();
+            CreateMap<BooksShelf, CreateBooksShelfVM>();
         }
     }
 }

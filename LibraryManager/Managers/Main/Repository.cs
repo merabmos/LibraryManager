@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
@@ -38,7 +39,7 @@ namespace LibraryManager.Managers.Main
             return table.ToList();
         }
 
-        public T GetById(object id)
+        public T GetByIdAsync(object id)
         {
             return table.Find(id);
         }
@@ -58,32 +59,54 @@ namespace LibraryManager.Managers.Main
                 Save();
             }
         }
-        public virtual void DeleteById(object Id)
-        {
-            var entity = GetById(Id);
-            if (entity != null)
-            {
-                table.Remove(entity);
-                Save();
-            }
-        }
-        public  void Delete(T existing)
+
+        public void Delete(T existing)
         {
             table.Remove(existing);
             Save();
         }
-        
+
+
+        public List<SelectListItem> GetAliveEntitiesSelectList(List<T> lists)
+        {
+            List<SelectListItem> employeeSelectList = new List<SelectListItem>();
+            try
+            {
+                foreach (var item in lists)
+                {
+                    object obj = (object) item;
+                    var GetNameProperty = item.GetType().GetProperty("Name");
+                    var GetIdProperty = item.GetType().GetProperty("Id");
+                    object valueOfName = GetNameProperty?.GetValue(obj, null);
+                    object valueOfId = GetIdProperty?.GetValue(obj, null);
+                    SelectListItem selectListItem = new SelectListItem
+                    {
+                        Text = valueOfName?.ToString(), Value = valueOfId?.ToString()
+                    };
+                    employeeSelectList.Add(selectListItem);
+                }
+
+                return employeeSelectList;
+            }
+            catch (NullReferenceException e)
+            {
+                return null;
+            }
+        }
+
         public List<SelectListItem> GetEmployeesSelectList()
         {
             var users = _userManager.Users;
             List<SelectListItem> employeeSelectList = new List<SelectListItem>();
             foreach (var employee in _userManager.Users)
             {
-                SelectListItem selectListItem = new SelectListItem();
-                selectListItem.Text = employee.FirstName + " " + employee.LastName;
-                selectListItem.Value = employee.Id;
+                SelectListItem selectListItem = new SelectListItem
+                {
+                    Text = employee.FirstName + " " + employee.LastName, Value = employee.Id
+                };
                 employeeSelectList.Add(selectListItem);
             }
+
             return employeeSelectList;
         }
 

@@ -5,6 +5,7 @@ using Domain.Interfaces;
 using LibraryManager.Managers;
 using LibraryManager.Managers.Main;
 using LibraryManager.Mappers;
+using LibraryManager.Models.BooksShelfModels;
 using LibraryManager.Validations;
 using LibraryManager.Validations.Interfaces;
 using Manager.Mappers;
@@ -36,11 +37,16 @@ namespace LibraryManager
 
             services.AddScoped<IAccountManager, AccountManager>();
             services.AddScoped<IEmployeeValidation, EmployeeValidation>();
+            services.AddScoped<IAdministrationManager,AdministrationManager>();
             services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
             services.AddScoped(typeof(IFilter<>), typeof(Filter<>));
+            services.AddScoped(typeof(IExpressionTree<>), typeof(ExpressionTree<>));
+
+            
             services.AddScoped<SectorManager>();
             services.AddScoped<SectionManager>();
-            services.AddScoped<IAdministrationManager,AdministrationManager>();
+            services.AddScoped<BooksShelfManager>();
+            services.AddScoped<BooksShelfVM>();
 
 
             services.AddIdentity<Employee, IdentityRole>(config =>

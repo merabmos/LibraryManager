@@ -13,10 +13,6 @@ namespace Domain.Interfaces
         IEnumerable<T> Intersect(params IEnumerable<T>[] lists);
         Task<List<T>> FilterInBetweenDates(string dateStart,
             string dateEnd, string propertyName, List<T> elements);
-        Task<List<T>> GetListById(int Id, string PropertyName, List<T> Elements);
-        Task<List<T>> GetListBy(object o, string PropertyName, List<T> Elements);
-        Expression<Func<T, bool>> GreatThan(object value, string dbEntityPropertyName);
-        Expression<Func<T, bool>> LessThan(object value, string dbEntityPropertyName);
-        Expression<Func<T, bool>> ExistOrNot(object value, string dbEntityPropertyName);
+        Task<List<T>> GetListByValue(object value, string PropertyName, List<T> Elements);
     }
 }

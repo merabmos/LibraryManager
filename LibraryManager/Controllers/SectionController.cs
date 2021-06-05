@@ -6,7 +6,6 @@ using AutoMapper;
 using Domain.Entities;
 using Domain.Interfaces;
 using LibraryManager.Managers;
-using LibraryManager.Models.SearchModels;
 using LibraryManager.Models.SectionModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -67,7 +66,7 @@ namespace LibraryManager.Controllers
 
                 if (item.SectorId != null)
                 {
-                    var sector = await _sectorManager.GetSectorById(item.SectorId);
+                    var sector = await _sectorManager.GetSectorByIdAsync(item.SectorId);
                     if (sector != null)
                         mapp.Sector = sector.Name;
                 }
@@ -127,7 +126,7 @@ namespace LibraryManager.Controllers
         {
             if (Id != 0)
             {
-                var entity = _repository.GetById(Id);
+                var entity = _repository.GetByIdAsync(Id);
                 if (entity != null)
                 {
                     var map = _mapper.Map<EditSectionVM>(entity);
@@ -158,7 +157,7 @@ namespace LibraryManager.Controllers
                         return View(model);
                     }
             
-            var entity = _repository.GetById(model.Id);
+            var entity = _repository.GetByIdAsync(model.Id);
             var map = _mapper.Map(model, entity);
             map.ModifierId = _userManager.GetUserId(User);
             map.ModifyDate = DateTime.Now;

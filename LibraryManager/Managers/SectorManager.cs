@@ -2,7 +2,7 @@
 using Domain.Entities;
 using Domain.Interfaces;
 using LibraryManager.Managers.Main;
-using LibraryManager.Models.SearchModels;
+using LibraryManager.Models.FilterModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -18,34 +18,23 @@ namespace LibraryManager.Managers
     {
         private readonly IFilter<Sector> _filter;
         private readonly LibraryManagerDBContext _context;
-
-        public SectorManager(LibraryManagerDBContext context, IFilter<Sector> filter)
+        private readonly IRepository<Sector> _repository;
+        
+        public SectorManager(LibraryManagerDBContext context, IFilter<Sector> filter, IRepository<Sector> repository)
         {
             _context = context;
             _filter = filter;
+            _repository = repository;
         }
-
 
         public async Task<List<Sector>> FilterAsync(SectorVM filter)
         {
             var sectors = _context.Sectors.Where(o => o.DeleteDate == null).ToList();
-            #region Commented
-
-            /*var GetPropertiesWithId = typeof(FilterVM).GetProperties().Where(o => o.Name.EndsWith("Id")).ToList();
-            foreach (var vari in GetPropertiesWithId)
-            {
-                   var manaxe = vari.Name.Replace("Id",string.Empty);
-                    List<Sector> GetById = vari.GetValue(filter).ToString().Length != 0
-                        ? await _filter.GetListById(filter.CreatorId, $"{manaxe}Id", sectors)
-                        : null;
-            }*/
-
-            #endregion
             List<Sector> GetByCreators = filter.CreatorId != null
-                ? await _filter.GetListBy(filter.CreatorId, "CreatorId", sectors)
+                ? await _filter.GetListByValue(filter.CreatorId, "CreatorId", sectors)
                 : null;
             List<Sector> GetByModifiers = filter.ModifierId != null
-                ? await _filter.GetListBy(filter.ModifierId, "ModifierId", sectors)
+                ? await _filter.GetListByValue(filter.ModifierId, "ModifierId", sectors)
                 : null;
 
             List<Sector> GetByBetweenInsertDate = filter.InsertStartDate != null || filter.InsertEndDate != null
@@ -64,12 +53,10 @@ namespace LibraryManager.Managers
 
             return FilteredSectors;
         }
-
-        public async Task<Sector> GetSectorById(int? id)
+        public async Task<Sector> GetSectorByIdAsync(int? id)
         {
             return await _context.Sectors.FindAsync(id);
         }
-
         public async Task<List<Sector>> FindBySearchAsync(object search)
         {
             return await Task.Run(() =>
@@ -78,40 +65,18 @@ namespace LibraryManager.Managers
                 return _context.Sectors.Where(o => o.Name.Contains((string) search)).ToList();
             });
         }
-
+        public async Task<List<Sector>> FilterTableByAsync(object obj,string columnInTable)
+        {
+            var Sectors = _context.Sectors.ToList();
+            List<Sector> GetBySectors = obj != null
+                ? await _filter.GetListByValue(obj,columnInTable, Sectors)
+                : null;
+            return GetBySectors;
+        }
         public List<SelectListItem> GetSectorsSelectList()
         {
-            List<SelectListItem> employeeSelectList = new List<SelectListItem>();
-            foreach (var sector in _context.Sectors.Where(o => o.DeleteDate == null))
-            {
-                SelectListItem selectListItem = new SelectListItem();
-                selectListItem.Text = sector.Name;
-                selectListItem.Value = sector.Id.ToString();
-                employeeSelectList.Add(selectListItem);
-            }
-
-            return employeeSelectList;
+            return _repository.GetAliveEntitiesSelectList(_context.Sectors.Where(o => o.DeleteDate == null).ToList());
         }
-
-        public List<SelectListItem> GetSectorsSelectList(int? Id)
-        {
-            List<SelectListItem> employeeSelectList = new List<SelectListItem>();
-            foreach (var sector in _context.Sectors.Where(o => o.DeleteDate == null))
-            {
-                SelectListItem selectListItem = new SelectListItem();
-                if ( _context.Sectors.Find(Id) != null)
-                {
-                    selectListItem.Selected = true;
-                }
-
-                selectListItem.Text = sector.Name;
-                selectListItem.Value = sector.Id.ToString();
-                employeeSelectList.Add(selectListItem);
-            }
-
-            return employeeSelectList;
-        }
-        
         public async Task RemoveByIdAsync(object id)
         {
             var section =  await _context.Sections.FindAsync(id);

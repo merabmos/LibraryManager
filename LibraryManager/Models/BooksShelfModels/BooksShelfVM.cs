@@ -1,13 +1,14 @@
 ﻿using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using Domain.Entities;
 using LibraryManager.Models.FilterModels;
+using LibraryManager.Models.SectionModels;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
-namespace LibraryManager.Models.SectionModels
+namespace LibraryManager.Models.BooksShelfModels
 {
-    public class SectionVM : FilterVM
+    public class BooksShelfVM : FilterVM
     {
-        
         public int Id { get; set; }
         public string Name { get; set; }
         public string InsertDate { get; set; }
@@ -17,10 +18,13 @@ namespace LibraryManager.Models.SectionModels
         [Display(Name = "Modifier Employee")]
         public string ModifierEmployee { get; set; }
         public string Sector { get; set; }
-
+        public string Section { get; set; }
+        public int SectionId { get; set; }
         public int SectorId { get; set; }
 
-        public List<SectionVM> Sections = new List<SectionVM>();
+        /*public List<Sector> Sectors = new List<Sector>();*/
+        public static readonly List<BooksShelfVM> BooksShelves = new List<BooksShelfVM>();
+        public List<SelectListItem> SectionsSelectList { get; set; } = new List<SelectListItem>();
         public List<SelectListItem> SectorsSelectList { get; set; } = new List<SelectListItem>();
         public List<SelectListItem> CreatorEmployeesSelectList { get; set; } = new List<SelectListItem>();
         public List<SelectListItem> ModifierEmployeesSelectList { get; set; } = new List<SelectListItem>();
