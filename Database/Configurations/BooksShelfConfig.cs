@@ -28,7 +28,12 @@ namespace Database.Configurations
             builder.HasOne(d => d.Section)
                 .WithMany(p => p.BooksShelves)
                 .HasForeignKey(d => d.SectionId)
-                .HasConstraintName("FK__BooksShel__Secti__5BAD9CC8");
+                .HasConstraintName("FK__BooksShel__Secti__5BAD9CC8").OnDelete(DeleteBehavior.Cascade);
+
+            builder.HasOne(d => d.Sector)
+            .WithMany(p => p.BooksShelves)
+            .HasForeignKey(d => d.SectorId)
+            .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

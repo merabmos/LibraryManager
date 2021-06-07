@@ -8,12 +8,13 @@ using Domain.Interfaces;
 using LibraryManager.Managers;
 using LibraryManager.Managers.Main;
 using LibraryManager.Models.BooksShelfModels;
-using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LibraryManager.Controllers
 {
+    [Authorize]
     public class BooksShelfController : Controller
     {
         private readonly SectorManager _sectorManager;
@@ -22,13 +23,12 @@ namespace LibraryManager.Controllers
         private readonly BooksShelfManager _booksShelfManager;
         private readonly IMapper _mapper;
         private readonly UserManager<Employee> _userManager;
-        private readonly BooksShelfVM _booksShelfVm;
-
+        private readonly Manager<BooksShelf> _manager;
         public BooksShelfController(SectorManager sectorManager,
             SectionManager sectionManager,
             IRepository<BooksShelf> repository,
             BooksShelfManager booksShelfManager,
-            IMapper mapper, UserManager<Employee> userManager, BooksShelfVM booksShelfVm)
+            IMapper mapper, UserManager<Employee> userManager, Manager<BooksShelf> manager)
         {
             _sectorManager = sectorManager;
             _sectionManager = sectionManager;
@@ -36,10 +36,10 @@ namespace LibraryManager.Controllers
             _booksShelfManager = booksShelfManager;
             _mapper = mapper;
             _userManager = userManager;
-            _booksShelfVm = booksShelfVm;
+            _manager = manager;
         }
-        
-        
+
+
         public async Task<List<Section>> GetSectionBySector([FromBody] string Id)
         {
             if (Id.Length != 0)
@@ -49,13 +49,16 @@ namespace LibraryManager.Controllers
             }
             return new List<Section>();
         }
-        
-        
+
+
         public ActionResult Index()
         {
+            BooksShelfVM _booksShelfVm = new BooksShelfVM();
             _booksShelfVm.CreatorEmployeesSelectList.AddRange(_repository.GetEmployeesSelectList());
             _booksShelfVm.ModifierEmployeesSelectList.AddRange(_repository.GetEmployeesSelectList());
-            _booksShelfVm.SectorsSelectList.AddRange(_sectorManager.GetSectorsSelectList());
+            _booksShelfVm.SectorsSelectList.AddRange(
+                _manager.GetEntitiesSelectList(
+                    _repository.GetAll().Where(o => o.DeleteDate == null).ToList()));
             return View(_booksShelfVm);
         }
 
@@ -68,43 +71,50 @@ namespace LibraryManager.Controllers
             {
                 var mapp = _mapper.Map<BooksShelfVM>(item);
 
-                if (item.CreatorId != null)
-                {
-                    var creatorEmployee = await _userManager.FindByIdAsync(item.CreatorId);
-                    mapp.CreatorEmployee = creatorEmployee.FirstName + " " + creatorEmployee.LastName;
-                }
 
                 if (item.ModifierId != null)
                 {
                     var modifierEmployee = await _userManager.FindByIdAsync(item.ModifierId);
                     mapp.ModifierEmployee = modifierEmployee.FirstName + " " + modifierEmployee.LastName;
                 }
-
-                if (item.SectionId != null)
-                {
-                    
-                    var section = await _sectionManager.GetSectionById(item.SectionId);
-                    mapp.Section = section.Name;
-                    var sector =  await _sectorManager.GetSectorByIdAsync(section.SectorId); 
-                    if (sector != null)
-                        mapp.Sector = sector.Name;
-                }
-                
                 else
                     mapp.ModifierEmployee = "";
                 
+                
+                var creatorEmployee = await _userManager.FindByIdAsync(item.CreatorId);
+                mapp.CreatorEmployee = creatorEmployee.FirstName + " " + creatorEmployee.LastName;
+                
+                var section = await _sectionManager.GetSectionById(item.SectionId);
+                mapp.Section = section.Name;
+
+                var sector = await _repository.GetByIdAsync(item.SectorId);
+                mapp.Sector = sector.Name;
+
+
                 booksShelves.Add(mapp);
             }
 
-            BooksShelfVM.BooksShelves.Clear();
-            BooksShelfVM.BooksShelves.AddRange(booksShelves);
-            return RedirectToAction("Index");
+            request.CreatorEmployeesSelectList.AddRange(_repository.GetEmployeesSelectList());
+            request.ModifierEmployeesSelectList.AddRange(_repository.GetEmployeesSelectList());
+            request.SectorsSelectList.AddRange(
+                _manager.GetEntitiesSelectList(
+                    _repository.GetAll().Where(o => o.DeleteDate == null).ToList()));
+           
+            request.SectionsSelectList.AddRange(
+                _sectionManager.GetSectionsSelectList(
+                    await GetSectionBySector(request.SectorId.ToString())));
+
+            request.BooksShelves.AddRange(booksShelves);
+            return View(request);
         }
+
         [HttpGet]
         public IActionResult Create()
         {
             CreateBooksShelfVM vm = new CreateBooksShelfVM();
-            vm.SectorsSelectList.AddRange(_sectorManager.GetSectorsSelectList());
+            vm.SectorsSelectList.AddRange(
+                _manager.GetEntitiesSelectList(
+                    _repository.GetAll().Where(o => o.DeleteDate == null).ToList()));
             return View(vm);
         }
 
@@ -112,80 +122,121 @@ namespace LibraryManager.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(CreateBooksShelfVM model)
         {
-                var filterbyname = await _booksShelfManager.FilterTableByAsync(model.Name, "Name");
-                var filterbysection = await _booksShelfManager.FilterTableByAsync(model.SectionId, "SectionId");
-                var filterbyLists = _booksShelfManager.FilterLists(filterbyname, filterbysection);
+            if (!ModelState.IsValid)
+            {
+                ModelState.AddModelError("", "Fill in all the fields");
+                model.SectorsSelectList.AddRange(
+                    _manager.GetEntitiesSelectList(
+                        _repository.GetAll().Where(o => o.DeleteDate == null).ToList()));
                 
-                if (filterbyLists.Any())
-                    foreach (var item in filterbyLists)
-                        if (item.DeleteDate != null)
-                            _repository.Delete(item);
-                        else
-                        {
-                            ModelState.AddModelError("", "This type already exists");
-                            model.SectorsSelectList.AddRange(_sectorManager.GetSectorsSelectList());
-                            return View(model);
-                        }
-               
-                var map = _mapper.Map<BooksShelf>(model);
-                map.InsertDate = DateTime.Now;
-                map.CreatorId = _userManager.GetUserId(User);
-                _repository.Insert(map);
-                return RedirectToAction("Create");
+                model.SectionsSelectList.AddRange(
+                    _sectionManager.GetSectionsSelectList(
+                        await GetSectionBySector(model.SectorId.ToString())));
+                return View(model);
+            }
+
+            var filterbyname = await _booksShelfManager.FilterTableByAsync(model.Name, "Name");
+            var filterbysection = await _booksShelfManager.FilterTableByAsync(model.SectionId, "SectionId");
+            var filterbysector = await _booksShelfManager.FilterTableByAsync(model.SectorId, "SectorId");
+            var filterbyLists = _booksShelfManager.FilterLists(filterbyname, filterbysection, filterbysector);
+
+            if (filterbyLists.Any())
+                foreach (var item in filterbyLists)
+                    if (item.DeleteDate != null)
+                        _repository.Delete(item);
+                    else
+                    {
+                        ModelState.AddModelError("", "This type already exists");
+                        model.SectorsSelectList.AddRange(
+                            _manager.GetEntitiesSelectList(
+                                _repository.GetAll().Where(o => o.DeleteDate == null).ToList()));
+                        return View(model);
+                    }
+
+            var map = _mapper.Map<BooksShelf>(model);
+            map.InsertDate = DateTime.Now;
+            map.CreatorId = _userManager.GetUserId(User);
+
+            _repository.Insert(map);
+            return RedirectToAction("Create");
         }
-    
+
         [HttpGet]
-        public ActionResult Edit()
+        public async Task<ActionResult> Edit(int Id)
         {
-            return View();
+            if (Id != 0)
+            {
+                var entity = await _repository.GetByIdAsync(Id);
+                if (entity != null)
+                {
+                    var filterbySectorId = await _sectionManager.FilterTableByAsync(entity.SectorId, "SectorId");
+                    var map = _mapper.Map<EditBooksShelfVM>(entity);
+                    map.SectorsSelectList.AddRange(
+                        _manager.GetEntitiesSelectList(
+                            _repository.GetAll().Where(o => o.DeleteDate == null).ToList()));
+                    map.SectionsSelectList.AddRange(_sectionManager.GetSectionsSelectList(filterbySectorId));
+                    return View(map);
+                }
+            }
+
+            return RedirectToAction("Index");
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
+        public async Task<ActionResult> Edit(EditBooksShelfVM model)
         {
-            try
+            if (!ModelState.IsValid)
             {
-                // TODO: Add update logic here
+                ModelState.AddModelError("", "Fill in all the fields");
+                
+                model.SectorsSelectList.AddRange(
+                    _manager.GetEntitiesSelectList(
+                        _repository.GetAll().Where(o => o.DeleteDate == null).ToList()));
+                
+                model.SectionsSelectList.AddRange(
+                    _sectionManager.GetSectionsSelectList(
+                        await GetSectionBySector(model.SectorId.ToString())));
+                return View(model);
+            }
 
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
+            var filterbyname = await _booksShelfManager.FilterTableByAsync(model.Name, "Name");
+            var filterbysection = await _booksShelfManager.FilterTableByAsync(model.SectionId, "SectionId");
+            var filterbysector = await _booksShelfManager.FilterTableByAsync(model.SectorId, "SectorId");
+            var filterbyLists = _booksShelfManager.FilterLists(filterbyname, filterbysection, filterbysector);
+
+            var filterbysectorId = await _sectionManager.FilterTableByAsync(model.SectorId, "SectorId");
+            
+            model.SectorsSelectList.AddRange(
+                _manager.GetEntitiesSelectList(
+                    _repository.GetAll().Where(o => o.DeleteDate == null).ToList()));
+            
+            model.SectionsSelectList.AddRange(_sectionManager.GetSectionsSelectList(filterbysectorId));
+
+            if (filterbyLists.Any())
+                foreach (var item in filterbyLists)
+                    if (item.DeleteDate != null)
+                        _repository.Delete(item);
+                    else
+                    {
+                        ModelState.AddModelError("", "This type already exists");
+                        return View(model);
+                    }
+
+            var entity = await _repository.GetByIdAsync(model.Id);
+            var map = _mapper.Map(model, entity);
+
+            map.ModifyDate = DateTime.Now;
+            map.ModifierId = _userManager.GetUserId(User);
+            _repository.Update(map);
+            return RedirectToAction("Index");
         }
-/*
-        // GET: BooksShelf/Delete/5
-        public ActionResult Delete(int id)
-        {
-            return View();
-        }*/
 
-        // POST: BooksShelf/Delete/5
-        /*[HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
+        [HttpGet]
+        public async Task<IActionResult> Delete(int Id)
         {
-            try
-            {
-                // TODO: Add delete logic here
-
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }*/
-        public IActionResult Edit(int id)
-        {
-            throw new NotImplementedException();
-        }
-
-        public IActionResult Delete(int id)
-        {
-            throw new NotImplementedException();
+            await _manager.RemoveByIdAsync(Id);
+            return RedirectToAction("Index");
         }
     }
 }

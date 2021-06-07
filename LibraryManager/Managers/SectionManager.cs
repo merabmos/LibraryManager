@@ -68,29 +68,24 @@ namespace LibraryManager.Managers
         {
             return await _context.Sections.FindAsync(id);
         }
-        public List<SelectListItem> GetSectionsSelectList()
+        public List<SelectListItem> GetSectionsSelectList(List<Section> list = null)
         {
+            if (list != null)
+            {
+                return _repository.GetAliveEntitiesSelectList(list);
+            }
+
             return _repository.GetAliveEntitiesSelectList(_context.Sections.Where(o => o.DeleteDate == null).ToList());
         }
         public async Task<List<Section>> FilterTableByAsync(object obj,string columnInTable)
         {
-            var sections = _context.Sections.ToList();
+            var sections = _context.Sections.Where(o => o.DeleteDate == null).ToList();
             List<Section> GetBySectors = obj != null
                 ? await _filter.GetListByValue(obj,columnInTable, sections)
                 : null;
             return GetBySectors;
         }
-         //Update delete time       
-        public async Task RemoveByIdAsync(object id)
-        {
-            var section =  await _context.Sections.FindAsync(id);
-            if (section != null)
-            {
-                section.DeleteDate = DateTime.Now;
-                _context.Sections.Update(section);
-                await _context.SaveChangesAsync();
-            }
-        }
+  
         public List<Section> FilterLists(params IEnumerable<Section>[] lists)
         {
             var FilteredSections = _filter.Intersect(lists).ToList();

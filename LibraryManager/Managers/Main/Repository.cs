@@ -17,9 +17,9 @@ namespace LibraryManager.Managers.Main
 {
     public class Repository<T> : IRepository<T> where T : class
     {
-        private LibraryManagerDBContext _context = null;
-        private DbSet<T> table = null;
-        private LibraryManagerDBContext context;
+        private readonly LibraryManagerDBContext _context;
+        private readonly DbSet<T> table = null;
+        private readonly LibraryManagerDBContext context;
         private readonly UserManager<Employee> _userManager;
 
         public Repository(LibraryManagerDBContext context, UserManager<Employee> userManager)
@@ -39,9 +39,9 @@ namespace LibraryManager.Managers.Main
             return table.ToList();
         }
 
-        public T GetByIdAsync(object id)
+        public async Task<T> GetByIdAsync(object id)
         {
-            return table.Find(id);
+            return await table.FindAsync(id);
         }
 
         public void Insert(T obj)
@@ -88,7 +88,7 @@ namespace LibraryManager.Managers.Main
 
                 return employeeSelectList;
             }
-            catch (NullReferenceException e)
+            catch (NullReferenceException)
             {
                 return null;
             }

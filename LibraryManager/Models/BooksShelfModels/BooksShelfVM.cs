@@ -23,7 +23,7 @@ namespace LibraryManager.Models.BooksShelfModels
         public int SectorId { get; set; }
 
         /*public List<Sector> Sectors = new List<Sector>();*/
-        public static readonly List<BooksShelfVM> BooksShelves = new List<BooksShelfVM>();
+        public   List<BooksShelfVM> BooksShelves = new List<BooksShelfVM>();
         public List<SelectListItem> SectionsSelectList { get; set; } = new List<SelectListItem>();
         public List<SelectListItem> SectorsSelectList { get; set; } = new List<SelectListItem>();
         public List<SelectListItem> CreatorEmployeesSelectList { get; set; } = new List<SelectListItem>();

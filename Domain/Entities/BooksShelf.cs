@@ -13,8 +13,8 @@ namespace Domain.Entities
         }
 
         public int Id { get; set; }
-        public int? SectionId { get; set; }
-        public int? SectorId { get; set; }
+        public int SectionId { get; set; }
+        public int SectorId { get; set; }
         public string Name { get; set; }
         public string CreatorId { get; set; }
         public string ModifierId { get; set; }

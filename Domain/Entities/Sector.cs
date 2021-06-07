@@ -21,5 +21,7 @@ namespace Domain.Entities
         public string ModifierId { get; set; }
 
         public virtual ICollection<Section> Sections { get; set; }
+        public virtual ICollection<BooksShelf> BooksShelves { get; set; }
+
     }
 }

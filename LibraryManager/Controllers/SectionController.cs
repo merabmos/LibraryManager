@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using AutoMapper;
 using Domain.Entities;
 using Domain.Interfaces;
+using LibraryManager.Managers.Main;
 using LibraryManager.Managers;
 using LibraryManager.Models.SectionModels;
 using Microsoft.AspNetCore.Authorization;
@@ -21,13 +22,14 @@ namespace LibraryManager.Controllers
         private readonly UserManager<Employee> _userManager;
         private readonly SectorManager _sectorManager;
         private readonly SectionManager _sectionManager;
-
+        private readonly Manager<Section> _manager;
         public SectionController(IRepository<Section> repository, IMapper mapper,
-            UserManager<Employee> userManager, SectorManager sectorManager, SectionManager sectionManager)
+            UserManager<Employee> userManager, SectorManager sectorManager, SectionManager sectionManager, Manager<Section> manager)
         {
             _mapper = mapper;
             _sectorManager = sectorManager;
             _sectionManager = sectionManager;
+            _manager = manager;
             _userManager = userManager;
             _repository = repository;
         }
@@ -157,7 +159,7 @@ namespace LibraryManager.Controllers
                         return View(model);
                     }
             
-            var entity = _repository.GetByIdAsync(model.Id);
+            var entity = await _repository.GetByIdAsync(model.Id);
             var map = _mapper.Map(model, entity);
             map.ModifierId = _userManager.GetUserId(User);
             map.ModifyDate = DateTime.Now;
@@ -168,7 +170,7 @@ namespace LibraryManager.Controllers
         [HttpGet]
         public async Task<ActionResult> Delete(int Id)
         {
-            await _sectionManager.RemoveByIdAsync(Id); 
+            await _manager.RemoveByIdAsync(Id); 
             return RedirectToAction("Index");
         }
     }

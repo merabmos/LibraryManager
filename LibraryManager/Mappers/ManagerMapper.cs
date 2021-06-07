@@ -40,6 +40,8 @@ namespace LibraryManager.Mappers
             CreateMap<BooksShelfVM, BooksShelf>();
             CreateMap<CreateBooksShelfVM,BooksShelf>();
             CreateMap<BooksShelf, CreateBooksShelfVM>();
+            CreateMap<EditBooksShelfVM,BooksShelf>();
+            CreateMap<BooksShelf, EditBooksShelfVM>();
         }
     }
 }

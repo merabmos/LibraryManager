@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq.Expressions;
+using System.Reflection;
 using Domain.Interfaces;
 
 namespace LibraryManager.Managers.Main
@@ -45,6 +46,19 @@ namespace LibraryManager.Managers.Main
 
             var expressionTree = Expression.Lambda<Func<T, bool>>(body, new[] {pe});
 
+            return expressionTree;
+        }
+        
+        public Expression<Func<T,T>> Assign(object value, string dbEntityPropertyName)
+        {
+            ParameterExpression pe = Expression.Parameter(typeof(T), "Entity");
+
+            MemberExpression column = Expression.PropertyOrField(pe, dbEntityPropertyName);
+          
+            BinaryExpression body = Expression.Assign(column, Expression.Convert(Expression.Constant(value), column.Type));
+            
+            var expressionTree = Expression.Lambda<Func<T,T>>(body,new[] {pe});
+            
             return expressionTree;
         }
     }

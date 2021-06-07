@@ -110,9 +110,7 @@ namespace LibraryManager.Controllers
                 return View(roleVm);
             }
             else
-            {
                 return RedirectToAction("Index");
-            }
         }
 
         // POST: Role/Edit/5
@@ -126,18 +124,13 @@ namespace LibraryManager.Controllers
                 role.Name = model.Name;
                 var result = await _administrationManager.EditRoleAsync(role);
                 if (result == null)
-                {
                     return RedirectToAction("Index");
-                }
                 else
-                {
                     foreach (var error in result.Errors)
                     {
                         ModelState.AddModelError("", error.Description);
                     }
-                }
             }
-
             return View();
         }
 
@@ -146,19 +139,13 @@ namespace LibraryManager.Controllers
         {
             var role = await _roleManager.FindByIdAsync(id);
             if (role == null)
-            {
                 return RedirectToAction("Index");
-            }
 
             var result = await _administrationManager.DeleteRoleAsync(role);
             if (result == null)
-            {
                 return RedirectToAction("Index");
-            }
             else
-            {
                 return RedirectToAction("Error", "Home");
-            }
         }
 
         [HttpGet]
@@ -204,17 +191,11 @@ namespace LibraryManager.Controllers
                 var user = await _userManager.FindByIdAsync(model[i].EmployeeId);
                 IdentityResult result = null;
                 if (model[i].IsSelected && !(await _userManager.IsInRoleAsync(user, role.Name)))
-                {
                     result = await _userManager.AddToRoleAsync(user, role.Name);
-                }
                 else if (!model[i].IsSelected && await _userManager.IsInRoleAsync(user, role.Name))
-                {
                     result = await _userManager.RemoveFromRoleAsync(user, role.Name);
-                }
                 else
-                {
                     continue;
-                }
 
                 if (result.Succeeded)
                 {

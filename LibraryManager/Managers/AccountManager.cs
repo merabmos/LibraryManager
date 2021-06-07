@@ -29,10 +29,7 @@ namespace LibraryManager.Managers
             _roleManager = roleManager;
         }
 
-        public async Task LogOutAsync()
-        {
-            await _signInManager.SignOutAsync();
-        }
+        public async Task LogOutAsync() =>  await _signInManager.SignOutAsync();
 
 
         public async Task<SignInResult> LogInAsync(string username, string password)
@@ -44,10 +41,7 @@ namespace LibraryManager.Managers
                     await _signInManager.PasswordSignInAsync(employee, password, true, lockoutOnFailure: false);
                 if (result.Succeeded)
                     return result;
-                else
-                    return null;
             }
-
             return null;
         }
 
@@ -58,42 +52,28 @@ namespace LibraryManager.Managers
             if (!reaction.Valid)
             {
                 return IdentityResult.Failed(
-                    new IdentityError[]
-                    {
                         new IdentityError
                         {
                             Code = "",
                             Description = reaction.ErrorMessage
                         }
-                    }
                 );
             }
-            else
-            {
-                entity.Password = password;
-                var result = await _userManager.CreateAsync(entity, password);
-                if (result.Succeeded)
-                {
-                    if (_userManager.Users.Count() == 1)
-                    {
-                        if (_roleManager.Roles.Any())
-                        {
-                            await _userManager.AddToRoleAsync(entity, "Super Administrator");
-                        }
-                    }
-                    else
-                    {
-                        if (_roleManager.Roles.Any())
-                        {
-                            await _userManager.AddToRoleAsync(entity, "Administrator");
-                        }
-                    }
-                    await _signInManager.SignInAsync(entity, true);
-                    return null;
-                }
 
-                return result;
+            entity.Password = password;
+            var result = await _userManager.CreateAsync(entity, password);
+            if (result.Succeeded)
+            {
+                if (_userManager.Users.Count() == 1)
+                    if (_roleManager.Roles.Any())
+                        await _userManager.AddToRoleAsync(entity, "Super Administrator");
+                    else if (_roleManager.Roles.Any())
+                        await _userManager.AddToRoleAsync(entity, "Administrator");
+                await _signInManager.SignInAsync(entity, true);
+                return null;
             }
+
+            return result;
         }
 
         public async Task<IdentityResult> UpdateDetailsAsync(Employee entity)
@@ -105,41 +85,34 @@ namespace LibraryManager.Managers
             if (!reactionUserName.Valid)
             {
                 return IdentityResult.Failed(
-                    new IdentityError[]
+                    new IdentityError
                     {
-                        new IdentityError
-                        {
-                            Code = "",
-                            Description = reactionUserName.ErrorMessage
-                        }
+                        Code = "",
+                        Description = reactionUserName.ErrorMessage
                     }
                 );
             }
-            else if (!reactionDetails.Valid)
+
+            if (!reactionDetails.Valid)
             {
                 return IdentityResult.Failed(
-                    new IdentityError[]
+                    new IdentityError
                     {
-                        new IdentityError
-                        {
-                            Code = "",
-                            Description = reactionDetails.ErrorMessage
-                        }
+                        Code = "",
+                        Description = reactionDetails.ErrorMessage
                     }
                 );
             }
-            else
-            {
-                entity.ModifyDate = DateTime.Now;
-                var result = await _userManager.UpdateAsync(entity);
-                if (result.Succeeded)
-                {
-                    await _signInManager.RefreshSignInAsync(entity);
-                    return null;
-                }
 
-                return result;
+            entity.ModifyDate = DateTime.Now;
+            var result = await _userManager.UpdateAsync(entity);
+            if (result.Succeeded)
+            {
+                await _signInManager.RefreshSignInAsync(entity);
+                return null;
             }
+
+            return result;
         }
 
         public async Task<IdentityResult> ChangePasswordAsync(Employee entity, string currentPassword,
@@ -153,8 +126,8 @@ namespace LibraryManager.Managers
                 await _signInManager.RefreshSignInAsync(entity);
                 return null;
             }
-            else
-                return result;
+
+            return result;
         }
     }
 }

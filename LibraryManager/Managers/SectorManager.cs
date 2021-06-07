@@ -19,7 +19,7 @@ namespace LibraryManager.Managers
         private readonly IFilter<Sector> _filter;
         private readonly LibraryManagerDBContext _context;
         private readonly IRepository<Sector> _repository;
-        
+
         public SectorManager(LibraryManagerDBContext context, IFilter<Sector> filter, IRepository<Sector> repository)
         {
             _context = context;
@@ -53,39 +53,16 @@ namespace LibraryManager.Managers
 
             return FilteredSectors;
         }
+
         public async Task<Sector> GetSectorByIdAsync(int? id)
         {
             return await _context.Sectors.FindAsync(id);
         }
-        public async Task<List<Sector>> FindBySearchAsync(object search)
-        {
-            return await Task.Run(() =>
-            {
-                // && o.DeleteDate == null
-                return _context.Sectors.Where(o => o.Name.Contains((string) search)).ToList();
-            });
-        }
-        public async Task<List<Sector>> FilterTableByAsync(object obj,string columnInTable)
-        {
-            var Sectors = _context.Sectors.ToList();
-            List<Sector> GetBySectors = obj != null
-                ? await _filter.GetListByValue(obj,columnInTable, Sectors)
-                : null;
-            return GetBySectors;
-        }
+
+
         public List<SelectListItem> GetSectorsSelectList()
         {
             return _repository.GetAliveEntitiesSelectList(_context.Sectors.Where(o => o.DeleteDate == null).ToList());
-        }
-        public async Task RemoveByIdAsync(object id)
-        {
-            var section =  await _context.Sections.FindAsync(id);
-            if (section != null)
-            {
-                section.DeleteDate = DateTime.Now;
-                _context.Sections.Update(section);
-                await _context.SaveChangesAsync();
-            }
         }
     }
 }

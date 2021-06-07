@@ -209,12 +209,17 @@ namespace Database.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<int?>("SectionId")
+                    b.Property<int>("SectionId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("SectorId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
                     b.HasIndex("SectionId");
+
+                    b.HasIndex("SectorId");
 
                     b.ToTable("BooksShelves");
                 });
@@ -559,7 +564,7 @@ namespace Database.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
-                    b.Property<int?>("SectorId")
+                    b.Property<int>("SectorId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -632,15 +637,15 @@ namespace Database.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "b92b976b-ed54-499a-a125-4c2898365079",
-                            ConcurrencyStamp = "c13c1f51-23a4-40b8-a405-f1bbabb3f6e4",
+                            Id = "0296bafe-0332-40c3-a63e-ea3399edfc66",
+                            ConcurrencyStamp = "eb0892bd-c7f4-42d1-81dd-5eaea6076a12",
                             Name = "Super Administrator",
                             NormalizedName = "SUPER ADMINISTRATOR"
                         },
                         new
                         {
-                            Id = "5001f34e-17f0-4e5e-922f-38bd9c2ad862",
-                            ConcurrencyStamp = "8500c715-5f8b-4f36-aa75-8215caa7d005",
+                            Id = "cde35e83-d5ed-4fcc-bab0-c2d49c5ad7f9",
+                            ConcurrencyStamp = "ddee6c11-2a8e-41b3-92e6-3bbdccd82c8d",
                             Name = "Administrator",
                             NormalizedName = "ADMINISTRATOR"
                         });
@@ -797,9 +802,19 @@ namespace Database.Migrations
                     b.HasOne("Domain.Entities.Section", "Section")
                         .WithMany("BooksShelves")
                         .HasForeignKey("SectionId")
-                        .HasConstraintName("FK__BooksShel__Secti__5BAD9CC8");
+                        .HasConstraintName("FK__BooksShel__Secti__5BAD9CC8")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("Domain.Entities.Sector", "Sector")
+                        .WithMany("BooksShelves")
+                        .HasForeignKey("SectorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Section");
+
+                    b.Navigation("Sector");
                 });
 
             modelBuilder.Entity("Domain.Entities.BooksShelvesBook", b =>
@@ -845,7 +860,9 @@ namespace Database.Migrations
                     b.HasOne("Domain.Entities.Sector", "Sector")
                         .WithMany("Sections")
                         .HasForeignKey("SectorId")
-                        .HasConstraintName("FK__Sections__Sector__5CA1C101");
+                        .HasConstraintName("FK__Sections__Sector__5CA1C101")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Sector");
                 });
@@ -939,6 +956,8 @@ namespace Database.Migrations
 
             modelBuilder.Entity("Domain.Entities.Sector", b =>
                 {
+                    b.Navigation("BooksShelves");
+
                     b.Navigation("Sections");
                 });
 #pragma warning restore 612, 618

@@ -13,8 +13,6 @@ namespace Database.Configurations
     {
         public void Configure(EntityTypeBuilder<Section> builder)
         {
-        
-
             builder.Property(e => e.DeleteDate).HasColumnType("datetime");
 
             builder.Property(e => e.InsertDate)

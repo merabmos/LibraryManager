@@ -41,12 +41,12 @@ namespace LibraryManager
             services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
             services.AddScoped(typeof(IFilter<>), typeof(Filter<>));
             services.AddScoped(typeof(IExpressionTree<>), typeof(ExpressionTree<>));
-
             
+            
+            services.AddScoped(typeof(Manager<>));
             services.AddScoped<SectorManager>();
             services.AddScoped<SectionManager>();
             services.AddScoped<BooksShelfManager>();
-            services.AddScoped<BooksShelfVM>();
 
 
             services.AddIdentity<Employee, IdentityRole>(config =>

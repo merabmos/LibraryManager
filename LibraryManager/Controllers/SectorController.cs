@@ -10,24 +10,29 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using LibraryManager.Managers.Main;
 
 namespace LibraryManager.Controllers
 {
     [Authorize]
     public class SectorController : Controller
     {
-        private readonly IRepository<Sector> _repository;
-        private readonly IMapper _mapper;
         private readonly UserManager<Employee> _userManager;
+        private readonly IMapper _mapper;
+
         private readonly SectorManager _sectorManager;
 
+        private readonly IRepository<Sector> _repository;
+        private readonly Manager<Sector> _manager;
+        
         public SectorController(IRepository<Sector> repository, IMapper mappers,
-            UserManager<Employee> userManager, SectorManager sectorManager)
+            UserManager<Employee> userManager, SectorManager sectorManager, Manager<Sector> manager)
         {
             _repository = repository;
             _mapper = mappers;
             _userManager = userManager;
             _sectorManager = sectorManager;
+            _manager = manager;
         }
 
         [HttpPost]
@@ -42,6 +47,7 @@ namespace LibraryManager.Controllers
 
                 if (item.CreatorId != null)
                 {
+                    
                     var creatorEmployee = await _userManager.FindByIdAsync(item.CreatorId);
                     mapp.CreatorEmployee = creatorEmployee.FirstName + " " + creatorEmployee.LastName;
                 }
@@ -86,7 +92,7 @@ namespace LibraryManager.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Create(CreateSectorVM model)
         {
-            var data = await _sectorManager.FindBySearchAsync(model.Name);
+            var data = await _manager.FilterOfTableByAsync(model.Name,"Name");
             if (data.Any())
                 foreach (var item in data)
                     if (item.DeleteDate != null)
@@ -124,7 +130,7 @@ namespace LibraryManager.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Edit(EditSectorVM model)
         {
-            var data = await _sectorManager.FindBySearchAsync(model.Name);
+            var data = await _manager.FilterOfTableByAsync(model.Name,"Name");
             if (data.Any())
                 foreach (var item in data)
                     if (item.DeleteDate != null)
@@ -135,18 +141,23 @@ namespace LibraryManager.Controllers
                         return View(model);
                     }
             
-            var entity = _repository.GetByIdAsync(model.Id);
+            var entity = await _repository.GetByIdAsync(model.Id);
+            
             var map = _mapper.Map(model, entity);
+            
             map.ModifyDate = DateTime.Now;
+            
             map.ModifierId = _userManager.GetUserId(User);
+            
             _repository.Update(map);
+            
             return RedirectToAction("Index");
         }
 
         [HttpGet]
         public async Task<ActionResult> Delete(int Id)
         {
-            await _sectorManager.RemoveByIdAsync(Id);
+            await _manager.RemoveByIdAsync(Id);
             return RedirectToAction("Index");
         }
     }

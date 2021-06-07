@@ -41,13 +41,11 @@ namespace LibraryManager.Controllers
             var employees = _repository.GetAll();
             List<EmployeeVM> employeeVM = new List<EmployeeVM>();
             foreach (var item in employees)
-            {
                 if (item.DeleteDate == null)
                 {
                     var map = _mapper.Map<EmployeeVM>(item);
                     employeeVM.Add(map);
                 }
-            }
             return View(employeeVM);
         }
 
@@ -104,9 +102,7 @@ namespace LibraryManager.Controllers
                 return View(model);
             }
             else
-            {
                 return RedirectToAction("Index", "Home");
-            }
         }
 
         [HttpGet]

@@ -10,7 +10,7 @@ namespace Domain.Interfaces
     {
         IEnumerable<T> GetAll();
         
-        T GetByIdAsync(object id);
+        Task<T> GetByIdAsync(object id);
         
         void Insert(T obj);
         void Update(T obj);

@@ -25,7 +25,6 @@ namespace LibraryManager.Managers.Main
             lists = lists.Where(l => l != null).ToArray();
 
             if (lists.Any())
-            {
                 if (lists.Length > 0)
                 {
                     results = lists[0];
@@ -34,10 +33,7 @@ namespace LibraryManager.Managers.Main
                         results = results.Intersect(lists[i]);
                 }
                 else
-                {
                     results = new T[0];
-                }
-            }
 
             return results;
         }

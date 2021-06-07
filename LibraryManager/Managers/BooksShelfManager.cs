@@ -8,6 +8,7 @@ using Domain.Interfaces;
 using LibraryManager.Managers.Main;
 using LibraryManager.Models.BooksShelfModels;
 using LibraryManager.Models.SectionModels;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace LibraryManager.Managers
 {
@@ -15,19 +16,25 @@ namespace LibraryManager.Managers
     {
         private readonly IFilter<BooksShelf> _filter;
         private readonly LibraryManagerDBContext _context;
-        private readonly SectorManager _sectorManager;   
-        public BooksShelfManager(LibraryManagerDBContext context, IFilter<BooksShelf> filter, SectorManager sectorManager)
+        private readonly SectorManager _sectorManager;
+        private readonly IRepository<BooksShelf> _repository;
+        public BooksShelfManager(LibraryManagerDBContext context, IFilter<BooksShelf> filter, SectorManager sectorManager, IRepository<BooksShelf> repository)
         {
             _context = context;
             _filter = filter;
             _sectorManager = sectorManager;
+            _repository = repository;
         }
 
         public async Task<List<BooksShelf>> FilterAsync(BooksShelfVM filter)
         {
             var entitites = _context.BooksShelves.Where(o => o.DeleteDate == null).ToList();
             var sectors = _context.Sectors.ToList();
-       
+        
+            List<BooksShelf> GetBySectors = filter.SectorId != 0
+                ? await _filter.GetListByValue(filter.SectorId, "SectorId", entitites)
+                : null;
+            
             List<BooksShelf> GetBySections = filter.SectionId != 0
                 ? await _filter.GetListByValue(filter.SectionId, "SectionId", entitites)
                 : null;
@@ -52,7 +59,7 @@ namespace LibraryManager.Managers
 
             var FilteredLists = _filter.Intersect(entitites, GetByBetweenInsertDate, GetByCreators,
                 GetByModifiers,
-                GetByBetweenModifyDate, GetBySections);
+                GetByBetweenModifyDate, GetBySections , GetBySectors);
 
             entitites = new List<BooksShelf>();
 
@@ -60,6 +67,12 @@ namespace LibraryManager.Managers
                 entitites.Add(item);
 
             return entitites;
+        }
+
+
+        public List<SelectListItem> GetBooksShelvesSelectList()
+        {
+            return _repository.GetAliveEntitiesSelectList(_context.BooksShelves.Where(o => o.DeleteDate == null).ToList());
         }
         public async Task<List<BooksShelf>> FilterTableByAsync(object obj, string columnInTable)
         {
@@ -72,14 +85,16 @@ namespace LibraryManager.Managers
         //Update delete time       
         public async Task RemoveByIdAsync(object id)
         {
-            var section = await _context.Sections.FindAsync(id);
-            if (section != null)
+            var entity = await _context.BooksShelves.FindAsync(id);
+            if (entity != null)
             {
-                section.DeleteDate = DateTime.Now;
-                _context.Sections.Update(section);
+                entity.DeleteDate = DateTime.Now;
+                _context.BooksShelves.Update(entity);
                 await _context.SaveChangesAsync();
             }
         }
+        
+        
         public List<BooksShelf> FilterLists(params IEnumerable<BooksShelf>[] lists)
         {
             var FilteredSections = _filter.Intersect(lists).ToList();
