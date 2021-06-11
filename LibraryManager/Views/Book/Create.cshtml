@@ -1,0 +1,23 @@
+﻿@model CreateBookVM
+<form method="post">
+    <div>
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text">Title</span>
+            </div>
+            <input type="text" asp-for="Name" class="form-control" placeholder="Title">
+        </div>
+    </div>
+    <div>
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <span class="input-group-text">Books Total Count</span>
+            </div>
+            <input type="text" asp-for="TotalCount" class="form-control" placeholder="Number">
+        </div>
+    </div>
+    <input type="submit" value="Next" checked class="btn btn-outline-dark"/>
+</form>
+@section Scripts {
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+}

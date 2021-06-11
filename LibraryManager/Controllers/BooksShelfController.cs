@@ -23,12 +23,11 @@ namespace LibraryManager.Controllers
         private readonly BooksShelfManager _booksShelfManager;
         private readonly IMapper _mapper;
         private readonly UserManager<Employee> _userManager;
-        private readonly Manager<BooksShelf> _manager;
         public BooksShelfController(SectorManager sectorManager,
             SectionManager sectionManager,
             IRepository<BooksShelf> repository,
             BooksShelfManager booksShelfManager,
-            IMapper mapper, UserManager<Employee> userManager, Manager<BooksShelf> manager)
+            IMapper mapper, UserManager<Employee> userManager)
         {
             _sectorManager = sectorManager;
             _sectionManager = sectionManager;
@@ -36,7 +35,6 @@ namespace LibraryManager.Controllers
             _booksShelfManager = booksShelfManager;
             _mapper = mapper;
             _userManager = userManager;
-            _manager = manager;
         }
 
 
@@ -57,8 +55,7 @@ namespace LibraryManager.Controllers
             _booksShelfVm.CreatorEmployeesSelectList.AddRange(_repository.GetEmployeesSelectList());
             _booksShelfVm.ModifierEmployeesSelectList.AddRange(_repository.GetEmployeesSelectList());
             _booksShelfVm.SectorsSelectList.AddRange(
-                _manager.GetEntitiesSelectList(
-                    _repository.GetAll().Where(o => o.DeleteDate == null).ToList()));
+                _sectorManager.GetSectorsSelectList());
             return View(_booksShelfVm);
         }
 
@@ -71,25 +68,26 @@ namespace LibraryManager.Controllers
             {
                 var mapp = _mapper.Map<BooksShelfVM>(item);
 
-
-                if (item.ModifierId != null)
+                if (item.ModifierId != null && await _userManager.FindByIdAsync(item.ModifierId) != null)
                 {
                     var modifierEmployee = await _userManager.FindByIdAsync(item.ModifierId);
                     mapp.ModifierEmployee = modifierEmployee.FirstName + " " + modifierEmployee.LastName;
                 }
                 else
                     mapp.ModifierEmployee = "";
-                
-                
-                var creatorEmployee = await _userManager.FindByIdAsync(item.CreatorId);
-                mapp.CreatorEmployee = creatorEmployee.FirstName + " " + creatorEmployee.LastName;
+
+                if (await _userManager.FindByIdAsync(item.CreatorId) != null)
+                {
+                    var creatorEmployee = await _userManager.FindByIdAsync(item.CreatorId);
+                    mapp.CreatorEmployee = creatorEmployee.FirstName + " " + creatorEmployee.LastName;
+                }
+              
                 
                 var section = await _sectionManager.GetSectionById(item.SectionId);
                 mapp.Section = section.Name;
 
-                var sector = await _repository.GetByIdAsync(item.SectorId);
+                var sector = await _sectorManager.GetSectorByIdAsync(item.SectorId);
                 mapp.Sector = sector.Name;
-
 
                 booksShelves.Add(mapp);
             }
@@ -97,8 +95,7 @@ namespace LibraryManager.Controllers
             request.CreatorEmployeesSelectList.AddRange(_repository.GetEmployeesSelectList());
             request.ModifierEmployeesSelectList.AddRange(_repository.GetEmployeesSelectList());
             request.SectorsSelectList.AddRange(
-                _manager.GetEntitiesSelectList(
-                    _repository.GetAll().Where(o => o.DeleteDate == null).ToList()));
+                _sectorManager.GetSectorsSelectList());
            
             request.SectionsSelectList.AddRange(
                 _sectionManager.GetSectionsSelectList(
@@ -113,8 +110,7 @@ namespace LibraryManager.Controllers
         {
             CreateBooksShelfVM vm = new CreateBooksShelfVM();
             vm.SectorsSelectList.AddRange(
-                _manager.GetEntitiesSelectList(
-                    _repository.GetAll().Where(o => o.DeleteDate == null).ToList()));
+                _sectorManager.GetSectorsSelectList());
             return View(vm);
         }
 
@@ -126,8 +122,7 @@ namespace LibraryManager.Controllers
             {
                 ModelState.AddModelError("", "Fill in all the fields");
                 model.SectorsSelectList.AddRange(
-                    _manager.GetEntitiesSelectList(
-                        _repository.GetAll().Where(o => o.DeleteDate == null).ToList()));
+                    _sectorManager.GetSectorsSelectList());
                 
                 model.SectionsSelectList.AddRange(
                     _sectionManager.GetSectionsSelectList(
@@ -148,8 +143,7 @@ namespace LibraryManager.Controllers
                     {
                         ModelState.AddModelError("", "This type already exists");
                         model.SectorsSelectList.AddRange(
-                            _manager.GetEntitiesSelectList(
-                                _repository.GetAll().Where(o => o.DeleteDate == null).ToList()));
+                            _sectorManager.GetSectorsSelectList());
                         return View(model);
                     }
 
@@ -172,8 +166,7 @@ namespace LibraryManager.Controllers
                     var filterbySectorId = await _sectionManager.FilterTableByAsync(entity.SectorId, "SectorId");
                     var map = _mapper.Map<EditBooksShelfVM>(entity);
                     map.SectorsSelectList.AddRange(
-                        _manager.GetEntitiesSelectList(
-                            _repository.GetAll().Where(o => o.DeleteDate == null).ToList()));
+                        _sectorManager.GetSectorsSelectList());
                     map.SectionsSelectList.AddRange(_sectionManager.GetSectionsSelectList(filterbySectorId));
                     return View(map);
                 }
@@ -191,8 +184,7 @@ namespace LibraryManager.Controllers
                 ModelState.AddModelError("", "Fill in all the fields");
                 
                 model.SectorsSelectList.AddRange(
-                    _manager.GetEntitiesSelectList(
-                        _repository.GetAll().Where(o => o.DeleteDate == null).ToList()));
+                        _sectorManager.GetSectorsSelectList());
                 
                 model.SectionsSelectList.AddRange(
                     _sectionManager.GetSectionsSelectList(
@@ -208,8 +200,7 @@ namespace LibraryManager.Controllers
             var filterbysectorId = await _sectionManager.FilterTableByAsync(model.SectorId, "SectorId");
             
             model.SectorsSelectList.AddRange(
-                _manager.GetEntitiesSelectList(
-                    _repository.GetAll().Where(o => o.DeleteDate == null).ToList()));
+                _sectorManager.GetSectorsSelectList());
             
             model.SectionsSelectList.AddRange(_sectionManager.GetSectionsSelectList(filterbysectorId));
 
@@ -225,7 +216,12 @@ namespace LibraryManager.Controllers
 
             var entity = await _repository.GetByIdAsync(model.Id);
             var map = _mapper.Map(model, entity);
-
+            
+            if (await _userManager.FindByIdAsync(map.CreatorId) == null)
+            {
+                map.CreatorId = _userManager.GetUserId(User);
+            }
+            
             map.ModifyDate = DateTime.Now;
             map.ModifierId = _userManager.GetUserId(User);
             _repository.Update(map);
@@ -235,7 +231,7 @@ namespace LibraryManager.Controllers
         [HttpGet]
         public async Task<IActionResult> Delete(int Id)
         {
-            await _manager.RemoveByIdAsync(Id);
+            await _repository.Update_DeleteDate_ByIdAsync(Id);
             return RedirectToAction("Index");
         }
     }

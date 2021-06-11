@@ -1,63 +1,53 @@
-﻿using AutoMapper;
-using Domain.Entities;
-using Domain.Interfaces;
-using LibraryManager.Managers;
-using LibraryManager.Models.SectorModels;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using LibraryManager.Managers.Main;
+using AutoMapper;
+using Domain.Entities;
+using Domain.Interfaces;
+using LibraryManager.Managers;
+using LibraryManager.Models.GenreModels;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 
 namespace LibraryManager.Controllers
 {
-    [Authorize]
-    public class SectorController : Controller
+    public class GenreController : Controller
     {
         private readonly UserManager<Employee> _userManager;
         private readonly IMapper _mapper;
+        private readonly GenreManager _genreManager;
 
-        private readonly SectorManager _sectorManager;
-
-        private readonly IRepository<Sector> _repository;
-        
-        public SectorController(IRepository<Sector> repository, IMapper mappers,
-            UserManager<Employee> userManager, SectorManager sectorManager)
+        public GenreController(IMapper mappers,
+            UserManager<Employee> userManager, GenreManager sectorManager)
         {
-            _repository = repository;
             _mapper = mappers;
             _userManager = userManager;
-            _sectorManager = sectorManager;
+            _genreManager = sectorManager;
         }
-        
-        
-        
+
         [HttpGet]
         public ActionResult Index()
         {
-            SectorVM sectorVM = new SectorVM();
-            sectorVM.CreatorEmployeesSelectList.AddRange(_repository.GetEmployeesSelectList());
-            sectorVM.ModifierEmployeesSelectList.AddRange(_repository.GetEmployeesSelectList());
-
-            return View(sectorVM);
+            GenreVM model = new GenreVM();
+            model.CreatorEmployeesSelectList.AddRange(_genreManager.GetEmployeesSelectList());
+            model.ModifierEmployeesSelectList.AddRange(_genreManager.GetEmployeesSelectList());
+            return View(model);
         }
-        
+
         [HttpPost]
-        public async Task<ActionResult> Index(SectorVM request)
+        public async Task<ActionResult> Index(GenreVM request)
         {
-            var data = await _sectorManager.FilterAsync(request);
-            List<SectorVM> sectors = new List<SectorVM>();
+            var data = await _genreManager.FilterAsync(request);
+            List<GenreVM> genres = new List<GenreVM>();
 
             foreach (var item in data)
             {
-                var mapp = _mapper.Map<SectorVM>(item);
+                var mapp = _mapper.Map<GenreVM>(item);
 
                 if (await _userManager.FindByIdAsync(item.CreatorId) != null)
                 {
-                    
                     var creatorEmployee = await _userManager.FindByIdAsync(item.CreatorId);
                     mapp.CreatorEmployee = creatorEmployee.FirstName + " " + creatorEmployee.LastName;
                 }
@@ -70,80 +60,72 @@ namespace LibraryManager.Controllers
                 else
                     mapp.ModifierEmployee = "";
 
-                sectors.Add(mapp);
+                genres.Add(mapp);
             }
 
-            request = new SectorVM();
-            request.Sectors.AddRange(sectors);
-            request.CreatorEmployeesSelectList.AddRange(_repository.GetEmployeesSelectList());
-            request.ModifierEmployeesSelectList.AddRange(_repository.GetEmployeesSelectList());
+            request = new GenreVM();
+            request.Genres.AddRange(genres);
+            request.CreatorEmployeesSelectList.AddRange(_genreManager.GetEmployeesSelectList());
+            request.ModifierEmployeesSelectList.AddRange(_genreManager.GetEmployeesSelectList());
             return View(request);
         }
 
-      
-
-        // GET: SectorController/Create
+        [HttpGet]
         public ActionResult Create()
         {
             return View();
         }
 
-        // POST: SectorController/Create
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Create(CreateSectorVM model)
+        public async Task<ActionResult> Create(CreateGenreVM model)
         {
-            var data = await _sectorManager.FilterOfTableByAsync(model.Name,"Name");
+            var data = await _genreManager.FilterOfTableByAsync(model.Name, "Name");
             if (data.Any())
                 foreach (var item in data)
                     if (item.DeleteDate != null)
-                        _repository.Delete(item);
+                        _genreManager.Delete(item);
                     else
                     {
                         ModelState.AddModelError("", "This name already exists");
                         return View(model);
                     }
-               
-            var map = _mapper.Map<Sector>(model);
+
+            var map = _mapper.Map<Genre>(model);
             map.InsertDate = DateTime.Now;
             map.CreatorId = _userManager.GetUserId(User);
-            _repository.Insert(map);
+            _genreManager.Insert(map);
             return RedirectToAction("Create");
         }
 
-        // GET: SectorController/Edit/5
-        public async Task<IActionResult> Edit(int Id)
+        public async Task<ActionResult> Edit(int Id)
         {
             if (Id != 0)
             {
-                var sector = await _repository.GetByIdAsync(Id);
-                if (sector != null)
-                {
-                    var map = _mapper.Map<EditSectorVM>(sector);
-                    return View(map);
-                }
+                var entity = await _genreManager.GetByIdAsync(Id);
+                var map = _mapper.Map<EditGenreVM>(entity);
+                return View(map);
             }
-
             return RedirectToAction("Index");
         }
 
+        // POST: Genre/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<ActionResult> Edit(EditSectorVM model)
+        public async Task<ActionResult> Edit(EditGenreVM model)
         {
-            var data = await _sectorManager.FilterOfTableByAsync(model.Name,"Name");
+            var data = await _genreManager.FilterOfTableByAsync(model.Name, "Name");
             if (data.Any())
                 foreach (var item in data)
                     if (item.DeleteDate != null)
-                        _repository.Delete(item);
+                        _genreManager.Delete(item);
                     else
                     {
                         ModelState.AddModelError("", "This Name already exists");
                         return View(model);
                     }
-            
-            var entity = await _repository.GetByIdAsync(model.Id);
-            
+
+            var entity = await _genreManager.GetByIdAsync(model.Id);
+
             var map = _mapper.Map(model, entity);
             
             if (await _userManager.FindByIdAsync(map.CreatorId) == null)
@@ -151,19 +133,22 @@ namespace LibraryManager.Controllers
                 map.CreatorId = _userManager.GetUserId(User);
             }
 
+            
             map.ModifyDate = DateTime.Now;
-            
+
             map.ModifierId = _userManager.GetUserId(User);
-            
-            _repository.Update(map);
-            
+
+            _genreManager.Update(map);
+
             return RedirectToAction("Index");
         }
+
+   
 
         [HttpGet]
         public async Task<ActionResult> Delete(int Id)
         {
-            await _repository.Update_DeleteDate_ByIdAsync(Id);
+            await _genreManager.Update_DeleteDate_ByIdAsync(Id);
             return RedirectToAction("Index");
         }
     }

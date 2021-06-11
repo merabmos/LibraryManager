@@ -1,0 +1,23 @@
+@model CreateBookVM
+
+@{
+    ViewBag.Title = "Add Genre to book";
+    Layout = "_Layout";
+}
+<form method="post">
+    <div id="GenresForBook">
+        @Html.DropDownList("GenreId",
+            Model.GenresSelectList,
+            "Select \n Genre",
+            new {@class = "btn btn-secondary"})
+    </div>
+    <button> Add Genre Section </button>
+    <input type="submit" value="Next" class="btn btn-outline-dark"/>
+</form>
+<script src="js/addGenreToBook.js">
+
+</script>
+
+@section Scripts {
+    @{ await Html.RenderPartialAsync("_ValidationScriptsPartial"); }
+}

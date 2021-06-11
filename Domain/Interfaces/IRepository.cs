@@ -17,8 +17,8 @@ namespace Domain.Interfaces
         void Delete(T entity);
         
         void Save();
-        
+        Task Update_DeleteDate_ByIdAsync(object id);
         List<SelectListItem> GetEmployeesSelectList();
-        List<SelectListItem> GetAliveEntitiesSelectList(List<T> entities);
+        List<SelectListItem> GetEntitiesSelectList(List<T> entities);
     }
 }

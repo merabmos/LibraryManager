@@ -43,10 +43,13 @@ namespace LibraryManager
             services.AddScoped(typeof(IExpressionTree<>), typeof(ExpressionTree<>));
             
             
-            services.AddScoped(typeof(Manager<>));
+            services.AddScoped<AuthorManager>();          
+            services.AddScoped<GenreManager>();          
+            services.AddScoped<SectorManager>();
             services.AddScoped<SectorManager>();
             services.AddScoped<SectionManager>();
             services.AddScoped<BooksShelfManager>();
+            services.AddScoped<BookManager>();
 
 
             services.AddIdentity<Employee, IdentityRole>(config =>

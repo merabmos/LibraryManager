@@ -53,16 +53,26 @@ namespace LibraryManager.Managers
 
             return FilteredSectors;
         }
+        
+        
+        public async Task<List<Sector>> FilterOfTableByAsync(object obj, string columnInTable)
+        {
+            var Entities = _context.Sectors.ToList();
+            List<Sector> GetBySectors = obj != null
+                ? await _filter.GetListByValue(obj, columnInTable, Entities)
+                : null;
+            return GetBySectors;
+        }
 
+        
         public async Task<Sector> GetSectorByIdAsync(int? id)
         {
             return await _context.Sectors.FindAsync(id);
         }
 
-
         public List<SelectListItem> GetSectorsSelectList()
         {
-            return _repository.GetAliveEntitiesSelectList(_context.Sectors.Where(o => o.DeleteDate == null).ToList());
+            return _repository.GetEntitiesSelectList(_context.Sectors.Where(o => o.DeleteDate == null).ToList());
         }
     }
 }

@@ -118,8 +118,6 @@
                     <a class="collapse-item" asp-controller="Section" asp-action="Index">Sections</a>
                     <a class="collapse-item" asp-controller="BooksShelf" asp-action="Index">Books Shelf</a>
                     @*
-                            <a class="collapse-item" href="#">Sections</a>
-                            <a class="collapse-item" href="#">Book Shelves</a>
                             <div class="collapse-divider"></div>
                             <h6 class="collapse-header">Employee :</h6>
                             <a class="collapse-item" asp-action="Index" asp-controller="Employee">Employees</a>
@@ -130,22 +128,41 @@
                 </div>
             </div>
         </li>
-        @if (User.IsInRole("Super Administrator"))
-        {
-  <li class="nav-item">
-            <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseManage" aria-expanded="true"
+        <li class="nav-item">
+            <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseBook" aria-expanded="true"
                aria-controls="collapseManage">
                 <i class="fas fa-fw fa-folder"></i>
-                <span>Manage</span>
+                <span>Books</span>
             </a>
-            <div id="collapseManage" class="collapse" aria-labelledby="headingPages"
+            <div id="collapseBook" class="collapse" aria-labelledby="headingPages"
                  data-parent="#accordionSidebar">
                 <div class="bg-white py-2 collapse-inner rounded">
                     @*<h6 class="collapse-header">Places :</h6>*@
-                    <a class="collapse-item" asp-controller="Administration" asp-action="Employees">Employees</a>
-                </div>
+                    <a class="collapse-item"  href="#">Books</a>
+                    <div class="collapse-divider"></div>
+                    <h6 class="collapse-header">Attributes :</h6>
+                    <a class="collapse-item" asp-action="Index" asp-controller="Genre">Genres</a>
+                    <a class="collapse-item" asp-action="Index" asp-controller="Author">Authors</a>
+                    </div>
             </div>
         </li>
+
+        @if (User.IsInRole("Super Administrator"))
+        {
+            <li class="nav-item">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseManage" aria-expanded="true"
+                   aria-controls="collapseManage">
+                    <i class="fas fa-fw fa-folder"></i>
+                    <span>Manage</span>
+                </a>
+                <div id="collapseManage" class="collapse" aria-labelledby="headingPages"
+                     data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded">
+                        @*<h6 class="collapse-header">Places :</h6>*@
+                        <a class="collapse-item" asp-controller="Administration" asp-action="Employees">Employees</a>
+                    </div>
+                </div>
+            </li>
         }
 
         @*
@@ -183,7 +200,7 @@
 
     <!-- Topbar -->
     <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
-            <h5> @ViewBag.Title - Library Manager</h5>
+    <h5> @ViewBag.Title - Library Manager</h5>
     <!-- Sidebar Toggle (Topbar) -->
     <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
         <i class="fa fa-bars"></i>
@@ -355,7 +372,7 @@
 
         <li class="topbar-divider d-none d-sm-block"></li>-->
         <!-- #endregion -->
- 
+
         <li class="nav-item dropdown no-arrow">
             <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
@@ -370,13 +387,13 @@
                     <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
                     Details
                 </a>
-                  @if (User.IsInRole("Super Administrator"))
-                  {
-                      <a class="dropdown-item" asp-action="Index" asp-controller="Administration">
-                          <i class="fas fa-book fa-sm fa-fw mr-2 text-gray-400"></i>
-                          Administration
-                      </a>
-                  }
+                @if (User.IsInRole("Super Administrator"))
+                {
+                    <a class="dropdown-item" asp-action="Index" asp-controller="Administration">
+                        <i class="fas fa-book fa-sm fa-fw mr-2 text-gray-400"></i>
+                        Administration
+                    </a>
+                }
                 <div class="dropdown-divider"></div>
                 <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">
                     <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>

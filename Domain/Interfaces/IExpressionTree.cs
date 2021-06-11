@@ -7,7 +7,6 @@ namespace Domain.Interfaces
     {
         Expression<Func<T, bool>> GreatThan(object value, string dbEntityPropertyName);
         Expression<Func<T, bool>> LessThan(object value, string dbEntityPropertyName);
-        Expression<Func<T,T>> Assign(object value, string dbEntityPropertyName);
         Expression<Func<T, bool>> ExistOrNot(object value, string dbEntityPropertyName);
     }
 }

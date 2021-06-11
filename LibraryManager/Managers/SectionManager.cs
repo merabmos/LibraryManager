@@ -72,10 +72,10 @@ namespace LibraryManager.Managers
         {
             if (list != null)
             {
-                return _repository.GetAliveEntitiesSelectList(list);
+                return _repository.GetEntitiesSelectList(list);
             }
 
-            return _repository.GetAliveEntitiesSelectList(_context.Sections.Where(o => o.DeleteDate == null).ToList());
+            return _repository.GetEntitiesSelectList(_context.Sections.Where(o => o.DeleteDate == null).ToList());
         }
         public async Task<List<Section>> FilterTableByAsync(object obj,string columnInTable)
         {

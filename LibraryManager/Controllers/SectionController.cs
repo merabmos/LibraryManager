@@ -22,14 +22,13 @@ namespace LibraryManager.Controllers
         private readonly UserManager<Employee> _userManager;
         private readonly SectorManager _sectorManager;
         private readonly SectionManager _sectionManager;
-        private readonly Manager<Section> _manager;
+
         public SectionController(IRepository<Section> repository, IMapper mapper,
-            UserManager<Employee> userManager, SectorManager sectorManager, SectionManager sectionManager, Manager<Section> manager)
+            UserManager<Employee> userManager, SectorManager sectorManager, SectionManager sectionManager)
         {
             _mapper = mapper;
             _sectorManager = sectorManager;
             _sectionManager = sectionManager;
-            _manager = manager;
             _userManager = userManager;
             _repository = repository;
         }
@@ -54,27 +53,21 @@ namespace LibraryManager.Controllers
             {
                 var mapp = _mapper.Map<SectionVM>(item);
 
-                if (item.CreatorId != null)
+                if (await _userManager.FindByIdAsync(item.CreatorId) != null)
                 {
                     var creatorEmployee = await _userManager.FindByIdAsync(item.CreatorId);
                     mapp.CreatorEmployee = creatorEmployee.FirstName + " " + creatorEmployee.LastName;
                 }
 
-                if (item.ModifierId != null)
+                if (item.ModifierId != null && await _userManager.FindByIdAsync(item.ModifierId) != null)
                 {
                     var modifierEmployee = await _userManager.FindByIdAsync(item.ModifierId);
                     mapp.ModifierEmployee = modifierEmployee.FirstName + " " + modifierEmployee.LastName;
                 }
 
-                if (item.SectorId != null)
-                {
-                    var sector = await _sectorManager.GetSectorByIdAsync(item.SectorId);
-                    if (sector != null)
-                        mapp.Sector = sector.Name;
-                }
-
-                else
-                    mapp.ModifierEmployee = "";
+                var sector = await _sectorManager.GetSectorByIdAsync(item.SectorId);
+                if (sector != null)
+                    mapp.Sector = sector.Name;
 
                 section.Add(mapp);
             }
@@ -104,7 +97,6 @@ namespace LibraryManager.Controllers
             var filterbysector = await _sectionManager.FilterTableByAsync(model.SectorId, "SectorId");
             var filterbyLists = _sectionManager.FilterLists(filterbyname, filterbysector);
 
-      
             if (filterbyLists.Any())
                 foreach (var item in filterbyLists)
                     if (item.DeleteDate != null)
@@ -115,11 +107,11 @@ namespace LibraryManager.Controllers
                         model.SectorsSelectList.AddRange(_sectorManager.GetSectorsSelectList());
                         return View(model);
                     }
-               
+
             var map = _mapper.Map<Section>(model);
-                map.InsertDate = DateTime.Now;
-                map.CreatorId = _userManager.GetUserId(User);
-                _repository.Insert(map);
+            map.InsertDate = DateTime.Now;
+            map.CreatorId = _userManager.GetUserId(User);
+            _repository.Insert(map);
 
             return RedirectToAction("Create");
         }
@@ -158,9 +150,14 @@ namespace LibraryManager.Controllers
                         model.SectorsSelectList.AddRange(_sectorManager.GetSectorsSelectList());
                         return View(model);
                     }
-            
+
             var entity = await _repository.GetByIdAsync(model.Id);
             var map = _mapper.Map(model, entity);
+            if (await _userManager.FindByIdAsync(map.CreatorId) == null)
+            {
+                map.CreatorId = _userManager.GetUserId(User);
+            }
+
             map.ModifierId = _userManager.GetUserId(User);
             map.ModifyDate = DateTime.Now;
             _repository.Update(map);
@@ -170,7 +167,7 @@ namespace LibraryManager.Controllers
         [HttpGet]
         public async Task<ActionResult> Delete(int Id)
         {
-            await _manager.RemoveByIdAsync(Id); 
+            await _repository.Update_DeleteDate_ByIdAsync(Id);
             return RedirectToAction("Index");
         }
     }

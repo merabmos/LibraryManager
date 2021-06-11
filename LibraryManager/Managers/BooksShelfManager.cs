@@ -72,7 +72,7 @@ namespace LibraryManager.Managers
 
         public List<SelectListItem> GetBooksShelvesSelectList()
         {
-            return _repository.GetAliveEntitiesSelectList(_context.BooksShelves.Where(o => o.DeleteDate == null).ToList());
+            return _repository.GetEntitiesSelectList(_context.BooksShelves.Where(o => o.DeleteDate == null).ToList());
         }
         public async Task<List<BooksShelf>> FilterTableByAsync(object obj, string columnInTable)
         {

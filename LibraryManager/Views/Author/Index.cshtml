@@ -1,12 +1,12 @@
-﻿@model BooksShelfVM
+@model LibraryManager.Models.AuthorModels.AuthorVM
 
 @{
-    ViewBag.Title = "Books Shelves";
+    ViewBag.Title = "Authors";
 }
+
 <a class="btn btn-outline-dark ml-2 mb-2" asp-action="Create">Create New</a>
 <table class="table table-bordered table-responsive-lg">
     <form method="post">
-
         <thead>
         <tr>
             <th>
@@ -20,12 +20,6 @@
             </th>
             <th>
                 @Html.DisplayNameFor(model => model.ModifierEmployee)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Sector)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Section)
             </th>
             <th>
                 Options
@@ -73,30 +67,22 @@
                     new {@class = " btn btn-secondary"})
             </td>
             <td>
-                @Html.DropDownList("SectorId",
-                    Model.SectorsSelectList,
-                    "Select \n Sector",
-                    new {@class = "btn btn-secondary", OnChange="OnChange('GetSectionBySector','BooksShelf','SectorId','SectionId')"})
-            </td>
-            <td>
-                @Html.DropDownList("SectionId",
-                    Model.SectionsSelectList,
-                    "Select \n Section",
-                    new {@class = " btn btn-secondary"})
-            </td>
-            <td>
                 <button type="submit" id="SearchBtn" class="btn btn-outline-dark">Fitler</button>
             </td>
         </tr>
+
         </thead>
     </form>
 
 </table>
-<table class="table table-responsive-lg ">
+<table class="table table-hover table-responsive-lg ">
     <thead>
     <tr>
         <th>
             @Html.DisplayNameFor(model => model.Name)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.LastName)
         </th>
         <th>
             Insert Date :
@@ -111,22 +97,19 @@
             @Html.DisplayNameFor(model => model.ModifierEmployee)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.Sector)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.Section)
-        </th>
-        <th>
             Options
         </th>
     </tr>
     </thead>
-    <tbody id="Data">
-    @foreach (var record in Model.BooksShelves)
+    <tbody id="Data ">
+    @foreach (var record in Model.Authors)
     {
         <tr>
             <td>
                 @Html.DisplayFor(model => record.Name)
+            </td>
+            <td>
+                @Html.DisplayFor(model => record.LastName)
             </td>
             <td>
                 @Html.DisplayFor(model => record.InsertDate)
@@ -141,12 +124,6 @@
                 @Html.DisplayFor(model => record.ModifierEmployee)
             </td>
             <td>
-                @Html.DisplayFor(model => record.Sector)
-            </td>
-            <td>
-                @Html.DisplayFor(model => record.Section)
-            </td>
-            <td>
                 @Html.ActionLink("Edit", "Edit", new {Id = @record.Id}) |
                 @Html.ActionLink("Delete", "Delete", new {Id = @record.Id})
             </td>
@@ -154,6 +131,3 @@
     }
     </tbody>
 </table>
-<script src="~/js/ajaxCodeForSmallThings.js">
-
-</script>

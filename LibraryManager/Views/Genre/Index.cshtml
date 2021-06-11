@@ -1,12 +1,12 @@
-﻿@model BooksShelfVM
+@model LibraryManager.Models.GenreModels.GenreVM
 
 @{
-    ViewBag.Title = "Books Shelves";
+    ViewBag.Title = "Genres";
 }
+
 <a class="btn btn-outline-dark ml-2 mb-2" asp-action="Create">Create New</a>
 <table class="table table-bordered table-responsive-lg">
     <form method="post">
-
         <thead>
         <tr>
             <th>
@@ -22,12 +22,6 @@
                 @Html.DisplayNameFor(model => model.ModifierEmployee)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Sector)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.Section)
-            </th>
-            <th>
                 Options
             </th>
         </tr>
@@ -36,7 +30,7 @@
                 <div class="row">
                     <div class="col-md-12">
                         <label class="ml-2 mt-1" for="InsertStartDate"> From : </label>
-                        <input type="date" id="InsertStartDate" asp-for="InsertStartDate" min="1000-01-01"
+                        <input type="date" id="InsertStartDate"  asp-for="InsertStartDate" min="1000-01-01"
                                max="3000-12-31" class="w-75 mb-1 float-right form-control mr-sm-2 ml-2">
                     </div>
                     <div class="col-md-12">
@@ -50,12 +44,12 @@
                 <div class="row">
                     <div class="col-md-12">
                         <label class="ml-2 mt-1" for="ModifyStartDate"> From : </label>
-                        <input type="date" id="ModifyStartDate" asp-for="ModifyStartDate" min="1000-01-01"
+                        <input type="date" id="ModifyStartDate"  asp-for="ModifyStartDate" min="1000-01-01"
                                max="3000-12-31" class="w-75  mb-1 float-right form-control mr-sm-2 ml-2">
                     </div>
                     <div class="col-md-12">
                         <label class="ml-2 mt-1" for="ModifyEndDate"> To : </label>
-                        <input type="date" id="ModifyEndDate" asp-for="ModifyEndDate" min="1000-01-01"
+                        <input type="date" id="ModifyEndDate" asp-for="ModifyEndDate"  min="1000-01-01"
                                max="3000-12-31" class="w-75 float-right form-control mr-sm-2 ml-2">
                     </div>
                 </div>
@@ -73,26 +67,15 @@
                     new {@class = " btn btn-secondary"})
             </td>
             <td>
-                @Html.DropDownList("SectorId",
-                    Model.SectorsSelectList,
-                    "Select \n Sector",
-                    new {@class = "btn btn-secondary", OnChange="OnChange('GetSectionBySector','BooksShelf','SectorId','SectionId')"})
-            </td>
-            <td>
-                @Html.DropDownList("SectionId",
-                    Model.SectionsSelectList,
-                    "Select \n Section",
-                    new {@class = " btn btn-secondary"})
-            </td>
-            <td>
                 <button type="submit" id="SearchBtn" class="btn btn-outline-dark">Fitler</button>
             </td>
         </tr>
+
         </thead>
     </form>
 
 </table>
-<table class="table table-responsive-lg ">
+<table class="table table-hover table-responsive-lg ">
     <thead>
     <tr>
         <th>
@@ -111,18 +94,12 @@
             @Html.DisplayNameFor(model => model.ModifierEmployee)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.Sector)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.Section)
-        </th>
-        <th>
             Options
         </th>
     </tr>
     </thead>
-    <tbody id="Data">
-    @foreach (var record in Model.BooksShelves)
+    <tbody id="Data ">
+    @foreach (var record in Model.Genres)
     {
         <tr>
             <td>
@@ -141,19 +118,10 @@
                 @Html.DisplayFor(model => record.ModifierEmployee)
             </td>
             <td>
-                @Html.DisplayFor(model => record.Sector)
-            </td>
-            <td>
-                @Html.DisplayFor(model => record.Section)
-            </td>
-            <td>
-                @Html.ActionLink("Edit", "Edit", new {Id = @record.Id}) |
-                @Html.ActionLink("Delete", "Delete", new {Id = @record.Id})
+                @Html.ActionLink("Edit","Edit",new {Id = @record.Id}) | 
+                @Html.ActionLink("Delete","Delete",new {Id = @record.Id})
             </td>
         </tr>
     }
     </tbody>
 </table>
-<script src="~/js/ajaxCodeForSmallThings.js">
-
-</script>

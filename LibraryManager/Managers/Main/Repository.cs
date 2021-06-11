@@ -6,34 +6,24 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
-using System.Data;
 using System.Linq;
-using System.Linq.Expressions;
-using System.Text;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 
 namespace LibraryManager.Managers.Main
 {
     public class Repository<T> : IRepository<T> where T : class
     {
         private readonly LibraryManagerDBContext _context;
-        private readonly DbSet<T> table = null;
-        private readonly LibraryManagerDBContext context;
+        private readonly DbSet<T> table ;
         private readonly UserManager<Employee> _userManager;
-
+   
         public Repository(LibraryManagerDBContext context, UserManager<Employee> userManager)
         {
             _context = context;
             table = _context.Set<T>();
             _userManager = userManager;
         }
-
-        public Repository(LibraryManagerDBContext context)
-        {
-            this.context = context;
-        }
-
+  
         public IEnumerable<T> GetAll()
         {
             return table.ToList();
@@ -59,22 +49,22 @@ namespace LibraryManager.Managers.Main
                 Save();
             }
         }
-
+        
+        // Delete Record
         public void Delete(T existing)
         {
             table.Remove(existing);
             Save();
         }
-
-
-        public List<SelectListItem> GetAliveEntitiesSelectList(List<T> lists)
+        
+        public List<SelectListItem> GetEntitiesSelectList(List<T> lists)
         {
             List<SelectListItem> employeeSelectList = new List<SelectListItem>();
             try
             {
                 foreach (var item in lists)
                 {
-                    object obj = (object) item;
+                    object obj = item;
                     var GetNameProperty = item.GetType().GetProperty("Name");
                     var GetIdProperty = item.GetType().GetProperty("Id");
                     object valueOfName = GetNameProperty?.GetValue(obj, null);
@@ -93,10 +83,20 @@ namespace LibraryManager.Managers.Main
                 return null;
             }
         }
-
+        
+        // Update DeleteDate In Table
+        public async Task Update_DeleteDate_ByIdAsync(object id)
+        {
+            var entity = await table.FindAsync(id);
+            if (entity != null)
+            {
+                entity.GetType().GetProperty("DeleteDate")?.SetValue(entity,DateTime.Now);
+                Update(entity);
+            }
+        }
+        
         public List<SelectListItem> GetEmployeesSelectList()
         {
-            var users = _userManager.Users;
             List<SelectListItem> employeeSelectList = new List<SelectListItem>();
             foreach (var employee in _userManager.Users)
             {
