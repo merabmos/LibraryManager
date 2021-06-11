@@ -28,6 +28,13 @@ namespace LibraryManager.Controllers
             _userManager = userManager;
         }
         
+
+        public async Task<List<Genre>> JsonMethodForGenre(int genreId)
+        {
+                var genre =  await _genreManager.GetByIdAsync(genreId);
+                CreateBookVM.GenreIds().Add(genre.Id);
+                return _genreManager.GetAll().ToList();    
+        }
         public ActionResult Index()
         {
             return View();

@@ -4,6 +4,9 @@
     ViewBag.Title = "Add Genre to book";
     Layout = "_Layout";
 }
+<div id="ForSavedIds">
+
+</div>
 <form method="post">
     <div id="GenresForBook">
         @Html.DropDownList("GenreId",
@@ -11,7 +14,7 @@
             "Select \n Genre",
             new {@class = "btn btn-secondary"})
     </div>
-    <button> Add Genre Section </button>
+    <button OnClick="AddGenreToBook('JsonMethodForGenre','Book','GenreId','GenresForBook','ForSavedIds')> Add Genre Section </button>
     <input type="submit" value="Next" class="btn btn-outline-dark"/>
 </form>
 <script src="js/addGenreToBook.js">

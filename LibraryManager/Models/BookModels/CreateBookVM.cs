@@ -12,7 +12,7 @@ namespace LibraryManager.Models.BookModels
     {
         List<int> BooksShelfIds = new List<int>();
         List<int> AuthorIds = new List<int>();
-        List<int> GenreIds = new List<int>();
+        public static List<int> GenreIds = new List<int>();
 
 
         public int GenreId { get; set; }

@@ -76,13 +76,14 @@
                 @Html.DropDownList("SectorId",
                     Model.SectorsSelectList,
                     "Select \n Sector",
-                    new {@class = "btn btn-secondary", OnChange="OnChange('GetSectionBySector','BooksShelf','SectorId','SectionId')"})
+                    new {@class = " btn btn-secondary"})
             </td>
             <td>
-                @Html.DropDownList("SectionId",
-                    Model.SectionsSelectList,
-                    "Select \n Section",
-                    new {@class = " btn btn-secondary"})
+                <select asp-for="SectionId" class="btn btn-secondary">
+                    <option selected="selected">
+                        Select Section
+                    </option>
+                </select>
             </td>
             <td>
                 <button type="submit" id="SearchBtn" class="btn btn-outline-dark">Fitler</button>
@@ -122,7 +123,7 @@
     </tr>
     </thead>
     <tbody id="Data">
-    @foreach (var record in Model.BooksShelves)
+    @foreach (var record in BooksShelfVM.BooksShelves)
     {
         <tr>
             <td>
@@ -152,8 +153,9 @@
             </td>
         </tr>
     }
+
     </tbody>
 </table>
-<script src="~/js/ajaxCodeForSmallThings.js">
+<script src="~/js/AjaxCodeForSmallThings.js">
 
 </script>
