@@ -79,7 +79,7 @@ namespace LibraryManager.Controllers
         [HttpPost]
         public async Task<ActionResult> Create(CreateGenreVM model)
         {
-            var data = await _genreManager.FilterOfTableByAsync(model.Name, "Name");
+            var data = await _genreManager.FilterOfEntititesByValue(model.Name, "Name");
             if (data.Any())
                 foreach (var item in data)
                     if (item.DeleteDate != null)
@@ -113,7 +113,7 @@ namespace LibraryManager.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Edit(EditGenreVM model)
         {
-            var data = await _genreManager.FilterOfTableByAsync(model.Name, "Name");
+            var data = await _genreManager.FilterOfEntititesByValue(model.Name, "Name");
             if (data.Any())
                 foreach (var item in data)
                     if (item.DeleteDate != null)

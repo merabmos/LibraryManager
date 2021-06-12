@@ -11,8 +11,8 @@ namespace Domain.Interfaces
     public interface IFilter<T> where T : class
     {
         IEnumerable<T> Intersect(params IEnumerable<T>[] lists);
-        Task<List<T>> FilterInBetweenDates(string dateStart,
+        Task<List<T>> FilterOfDate(string dateStart,
             string dateEnd, string propertyName, List<T> elements);
-        Task<List<T>> GetListByValue(object value, string PropertyName, List<T> Elements);
+        Task<List<T>> FilterOfEntititesByValue(object value, string PropertyName, List<T> Elements);
     }
 }

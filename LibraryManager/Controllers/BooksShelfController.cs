@@ -1,12 +1,10 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using AutoMapper;
 using Domain.Entities;
 using Domain.Interfaces;
 using LibraryManager.Managers;
-using LibraryManager.Managers.Main;
 using LibraryManager.Models.BooksShelfModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -42,7 +40,7 @@ namespace LibraryManager.Controllers
         {
             if (Id.Length != 0)
             {
-                var filterbyname = await _sectionManager.FilterTableByAsync(Convert.ToInt32(Id), "SectorId");
+                var filterbyname = await _sectionManager.FilterOfEntititesByValue(Convert.ToInt32(Id), "SectorId");
                 return filterbyname;
             }
             return new List<Section>();
@@ -55,7 +53,7 @@ namespace LibraryManager.Controllers
             _booksShelfVm.CreatorEmployeesSelectList.AddRange(_repository.GetEmployeesSelectList());
             _booksShelfVm.ModifierEmployeesSelectList.AddRange(_repository.GetEmployeesSelectList());
             _booksShelfVm.SectorsSelectList.AddRange(
-                _sectorManager.GetSectorsSelectList());
+                _sectorManager.GetEntitiesSelectList());
             return View(_booksShelfVm);
         }
 
@@ -83,10 +81,10 @@ namespace LibraryManager.Controllers
                 }
               
                 
-                var section = await _sectionManager.GetSectionById(item.SectionId);
+                var section = await _sectionManager.GetByIdAsync(item.SectionId);
                 mapp.Section = section.Name;
 
-                var sector = await _sectorManager.GetSectorByIdAsync(item.SectorId);
+                var sector = await _sectorManager.GetByIdAsync(item.SectorId);
                 mapp.Sector = sector.Name;
 
                 booksShelves.Add(mapp);
@@ -95,10 +93,10 @@ namespace LibraryManager.Controllers
             request.CreatorEmployeesSelectList.AddRange(_repository.GetEmployeesSelectList());
             request.ModifierEmployeesSelectList.AddRange(_repository.GetEmployeesSelectList());
             request.SectorsSelectList.AddRange(
-                _sectorManager.GetSectorsSelectList());
+                _sectorManager.GetEntitiesSelectList());
            
             request.SectionsSelectList.AddRange(
-                _sectionManager.GetSectionsSelectList(
+                _sectionManager.GetEntitiesSelectList(
                     await GetSectionBySector(request.SectorId.ToString())));
 
             request.BooksShelves.AddRange(booksShelves);
@@ -110,7 +108,7 @@ namespace LibraryManager.Controllers
         {
             CreateBooksShelfVM vm = new CreateBooksShelfVM();
             vm.SectorsSelectList.AddRange(
-                _sectorManager.GetSectorsSelectList());
+                _sectorManager.GetEntitiesSelectList());
             return View(vm);
         }
 
@@ -122,20 +120,19 @@ namespace LibraryManager.Controllers
             {
                 ModelState.AddModelError("", "Fill in all the fields");
                 model.SectorsSelectList.AddRange(
-                    _sectorManager.GetSectorsSelectList());
+                    _sectorManager.GetEntitiesSelectList());
                 
                 model.SectionsSelectList.AddRange(
-                    _sectionManager.GetSectionsSelectList(
+                    _sectionManager.GetEntitiesSelectList(
                         await GetSectionBySector(model.SectorId.ToString())));
                 return View(model);
             }
 
-            var filterbyname = await _booksShelfManager.FilterTableByAsync(model.Name, "Name");
-            var filterbysection = await _booksShelfManager.FilterTableByAsync(model.SectionId, "SectionId");
-            var filterbysector = await _booksShelfManager.FilterTableByAsync(model.SectorId, "SectorId");
-            var filterbyLists = _booksShelfManager.FilterLists(filterbyname, filterbysection, filterbysector);
+            var filterbyname = await _booksShelfManager.FilterOfEntititesByValue(model.Name, "Name");
+            var filterbysection = await _booksShelfManager.FilterOfEntititesByValue(model.SectionId, "SectionId");
+            var filterbysector = await _booksShelfManager.FilterOfEntititesByValue(model.SectorId, "SectorId");
+            var filterbyLists = _booksShelfManager.Intersect(filterbyname, filterbysection, filterbysector);
 
-            if (filterbyLists.Any())
                 foreach (var item in filterbyLists)
                     if (item.DeleteDate != null)
                         _repository.Delete(item);
@@ -143,7 +140,7 @@ namespace LibraryManager.Controllers
                     {
                         ModelState.AddModelError("", "This type already exists");
                         model.SectorsSelectList.AddRange(
-                            _sectorManager.GetSectorsSelectList());
+                            _sectorManager.GetEntitiesSelectList());
                         return View(model);
                     }
 
@@ -163,11 +160,11 @@ namespace LibraryManager.Controllers
                 var entity = await _repository.GetByIdAsync(Id);
                 if (entity != null)
                 {
-                    var filterbySectorId = await _sectionManager.FilterTableByAsync(entity.SectorId, "SectorId");
+                    var filterbySectorId = await _sectionManager.FilterOfEntititesByValue(entity.SectorId, "SectorId");
                     var map = _mapper.Map<EditBooksShelfVM>(entity);
                     map.SectorsSelectList.AddRange(
-                        _sectorManager.GetSectorsSelectList());
-                    map.SectionsSelectList.AddRange(_sectionManager.GetSectionsSelectList(filterbySectorId));
+                        _sectorManager.GetEntitiesSelectList());
+                    map.SectionsSelectList.AddRange(_sectionManager.GetEntitiesSelectList(filterbySectorId));
                     return View(map);
                 }
             }
@@ -184,27 +181,26 @@ namespace LibraryManager.Controllers
                 ModelState.AddModelError("", "Fill in all the fields");
                 
                 model.SectorsSelectList.AddRange(
-                        _sectorManager.GetSectorsSelectList());
+                        _sectorManager.GetEntitiesSelectList());
                 
                 model.SectionsSelectList.AddRange(
-                    _sectionManager.GetSectionsSelectList(
+                    _sectionManager.GetEntitiesSelectList(
                         await GetSectionBySector(model.SectorId.ToString())));
                 return View(model);
             }
 
-            var filterbyname = await _booksShelfManager.FilterTableByAsync(model.Name, "Name");
-            var filterbysection = await _booksShelfManager.FilterTableByAsync(model.SectionId, "SectionId");
-            var filterbysector = await _booksShelfManager.FilterTableByAsync(model.SectorId, "SectorId");
-            var filterbyLists = _booksShelfManager.FilterLists(filterbyname, filterbysection, filterbysector);
+            var filterbyname = await _booksShelfManager.FilterOfEntititesByValue(model.Name, "Name");
+            var filterbysection = await _booksShelfManager.FilterOfEntititesByValue(model.SectionId, "SectionId");
+            var filterbysector = await _booksShelfManager.FilterOfEntititesByValue(model.SectorId, "SectorId");
+            var filterbyLists = _booksShelfManager.Intersect(filterbyname, filterbysection, filterbysector);
 
-            var filterbysectorId = await _sectionManager.FilterTableByAsync(model.SectorId, "SectorId");
+            var filterbysectorId = await _sectionManager.FilterOfEntititesByValue(model.SectorId, "SectorId");
             
             model.SectorsSelectList.AddRange(
-                _sectorManager.GetSectorsSelectList());
+                _sectorManager.GetEntitiesSelectList());
             
-            model.SectionsSelectList.AddRange(_sectionManager.GetSectionsSelectList(filterbysectorId));
+            model.SectionsSelectList.AddRange(_sectionManager.GetEntitiesSelectList(filterbysectorId));
 
-            if (filterbyLists.Any())
                 foreach (var item in filterbyLists)
                     if (item.DeleteDate != null)
                         _repository.Delete(item);

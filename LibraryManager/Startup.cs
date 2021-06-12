@@ -5,7 +5,6 @@ using Domain.Interfaces;
 using LibraryManager.Managers;
 using LibraryManager.Managers.Main;
 using LibraryManager.Mappers;
-using LibraryManager.Models.BooksShelfModels;
 using LibraryManager.Validations;
 using LibraryManager.Validations.Interfaces;
 using Manager.Mappers;
@@ -26,7 +25,7 @@ namespace LibraryManager
             Configuration = configuration;
         }
 
-        public IConfiguration Configuration { get; }
+        private IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)

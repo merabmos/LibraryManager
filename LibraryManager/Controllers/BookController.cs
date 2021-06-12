@@ -29,11 +29,11 @@ namespace LibraryManager.Controllers
         }
         
 
-        public async Task<List<Genre>> JsonMethodForGenre(int genreId)
+        public async Task<string> JsonMethodForGenre([FromBody]string Id)
         {
-                var genre =  await _genreManager.GetByIdAsync(genreId);
-                CreateBookVM.GenreIds().Add(genre.Id);
-                return _genreManager.GetAll().ToList();    
+                var genre =  await _genreManager.GetByIdAsync(Convert.ToInt32(Id));
+                CreateBookVM.GenreIds.Add(genre.Id);
+                return Id;    
         }
         public ActionResult Index()
         {
@@ -60,7 +60,7 @@ namespace LibraryManager.Controllers
         public ActionResult AddGenreToBook(int Id)
         {
             CreateBookVM model = new CreateBookVM();
-            model.GenresSelectList.AddRange(_genreManager.GetGenresSelectList());
+            model.GenresSelectList.AddRange(_genreManager.GetEntitiesSelectList());
             return View(model);
         }
         

@@ -10,7 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using LibraryManager.Managers.Main;
+
 
 namespace LibraryManager.Controllers
 {
@@ -93,7 +93,7 @@ namespace LibraryManager.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Create(CreateSectorVM model)
         {
-            var data = await _sectorManager.FilterOfTableByAsync(model.Name,"Name");
+            var data = await _sectorManager.FilterOfEntititesByValue(model.Name,"Name");
             if (data.Any())
                 foreach (var item in data)
                     if (item.DeleteDate != null)
@@ -131,7 +131,7 @@ namespace LibraryManager.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Edit(EditSectorVM model)
         {
-            var data = await _sectorManager.FilterOfTableByAsync(model.Name,"Name");
+            var data = await _sectorManager.FilterOfEntititesByValue(model.Name,"Name");
             if (data.Any())
                 foreach (var item in data)
                     if (item.DeleteDate != null)

@@ -10,18 +10,16 @@ namespace LibraryManager.Managers
 {
     public class BookManager : Repository<Book>
     {
-        private readonly IFilter<Genre> _filter;
+        private readonly IFilter<Book> _filter;
         private readonly LibraryManagerDBContext _context;
-        private readonly IRepository<Genre> _repository;
         private readonly IMapper _mapper;
 
-        public BookManager(LibraryManagerDBContext context, UserManager<Employee> userManager, IFilter<Genre> filter,
-            IRepository<Genre> repository, IMapper mapper) : base(context,
-            userManager)
+        public BookManager(LibraryManagerDBContext context, UserManager<Employee> userManager, IFilter<Book> filter,
+            IMapper mapper) : base(context,
+            userManager,filter)
         {
             _context = context;
             _filter = filter;
-            _repository = repository;
             _mapper = mapper;
         }
 

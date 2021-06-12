@@ -39,7 +39,7 @@ namespace LibraryManager.Controllers
             SectionVM sectionVm = new SectionVM();
             sectionVm.CreatorEmployeesSelectList.AddRange(_repository.GetEmployeesSelectList());
             sectionVm.ModifierEmployeesSelectList.AddRange(_repository.GetEmployeesSelectList());
-            sectionVm.SectorsSelectList.AddRange(_sectorManager.GetSectorsSelectList());
+            sectionVm.SectorsSelectList.AddRange(_sectorManager.GetEntitiesSelectList());
 
             return View(sectionVm);
         }
@@ -65,7 +65,7 @@ namespace LibraryManager.Controllers
                     mapp.ModifierEmployee = modifierEmployee.FirstName + " " + modifierEmployee.LastName;
                 }
 
-                var sector = await _sectorManager.GetSectorByIdAsync(item.SectorId);
+                var sector = await _sectorManager.GetByIdAsync(item.SectorId);
                 if (sector != null)
                     mapp.Sector = sector.Name;
 
@@ -75,7 +75,7 @@ namespace LibraryManager.Controllers
             request.Sections.AddRange(section);
             request.CreatorEmployeesSelectList.AddRange(_repository.GetEmployeesSelectList());
             request.ModifierEmployeesSelectList.AddRange(_repository.GetEmployeesSelectList());
-            request.SectorsSelectList.AddRange(_sectorManager.GetSectorsSelectList());
+            request.SectorsSelectList.AddRange(_sectorManager.GetEntitiesSelectList());
             return View(request);
         }
 
@@ -83,7 +83,7 @@ namespace LibraryManager.Controllers
         public ActionResult Create()
         {
             CreateSectionVM csVM = new CreateSectionVM();
-            csVM.SectorsSelectList.AddRange(_sectorManager.GetSectorsSelectList());
+            csVM.SectorsSelectList.AddRange(_sectorManager.GetEntitiesSelectList());
 
             return View(csVM);
         }
@@ -93,18 +93,17 @@ namespace LibraryManager.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Create(CreateSectionVM model)
         {
-            var filterbyname = await _sectionManager.FilterTableByAsync(model.Name, "Name");
-            var filterbysector = await _sectionManager.FilterTableByAsync(model.SectorId, "SectorId");
-            var filterbyLists = _sectionManager.FilterLists(filterbyname, filterbysector);
+            var filterbyname = await _sectionManager.FilterOfEntititesByValue(model.Name, "Name");
+            var filterbysector = await _sectionManager.FilterOfEntititesByValue(model.SectorId, "SectorId");
+            var filterbyLists = _sectionManager.Intersect(filterbyname, filterbysector);
 
-            if (filterbyLists.Any())
                 foreach (var item in filterbyLists)
                     if (item.DeleteDate != null)
                         _repository.Delete(item);
                     else
                     {
                         ModelState.AddModelError("", "This type already exists");
-                        model.SectorsSelectList.AddRange(_sectorManager.GetSectorsSelectList());
+                        model.SectorsSelectList.AddRange(_sectorManager.GetEntitiesSelectList());
                         return View(model);
                     }
 
@@ -124,7 +123,7 @@ namespace LibraryManager.Controllers
                 if (entity != null)
                 {
                     var map = _mapper.Map<EditSectionVM>(entity);
-                    map.SectorsSelectList.AddRange(_sectorManager.GetSectorsSelectList());
+                    map.SectorsSelectList.AddRange(_sectorManager.GetEntitiesSelectList());
                     return View(map);
                 }
             }
@@ -136,18 +135,17 @@ namespace LibraryManager.Controllers
         [ValidateAntiForgeryToken]
         public async Task<ActionResult> Edit(EditSectionVM model)
         {
-            var filterbyname = await _sectionManager.FilterTableByAsync(model.Name, "Name");
-            var filterbysector = await _sectionManager.FilterTableByAsync(model.SectorId, "SectorId");
-            var filterbyLists = _sectionManager.FilterLists(filterbyname, filterbysector);
-
-            if (filterbyLists.Any())
-                foreach (var item in filterbyLists)
+            var filterbyname = await _sectionManager.FilterOfEntititesByValue(model.Name, "Name");
+            var filterbysector = await _sectionManager.FilterOfEntititesByValue(model.SectorId, "SectorId");
+            var filterbyLists = _sectionManager.Intersect(filterbyname, filterbysector);
+                
+            foreach (var item in filterbyLists)
                     if (item.DeleteDate != null)
                         _repository.Delete(item);
                     else
                     {
                         ModelState.AddModelError("", "This type already exists");
-                        model.SectorsSelectList.AddRange(_sectorManager.GetSectorsSelectList());
+                        model.SectorsSelectList.AddRange(_sectorManager.GetEntitiesSelectList());
                         return View(model);
                     }
 

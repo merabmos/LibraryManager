@@ -8,35 +8,40 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using NLog.Filters;
 
 namespace LibraryManager.Managers.Main
 {
-    public class Repository<T> : IRepository<T> where T : class
+    public class Repository<T> : Filter<T>, IRepository<T> where T : class
     {
         private readonly LibraryManagerDBContext _context;
-        private readonly DbSet<T> table ;
+        private readonly DbSet<T> _table;
         private readonly UserManager<Employee> _userManager;
-   
-        public Repository(LibraryManagerDBContext context, UserManager<Employee> userManager)
+        private readonly IFilter<T> _filter;
+
+        public Repository(LibraryManagerDBContext context,
+            UserManager<Employee> userManager,
+            IFilter<T> filter) : base(context)
         {
             _context = context;
-            table = _context.Set<T>();
+            _table = _context.Set<T>();
             _userManager = userManager;
+            _filter = filter;
         }
-  
+
         public IEnumerable<T> GetAll()
         {
-            return table.ToList();
+            return _table.ToList();
         }
 
         public async Task<T> GetByIdAsync(object id)
         {
-            return await table.FindAsync(id);
+            return await _table.FindAsync(id);
         }
 
         public void Insert(T obj)
         {
-            table.Add(obj);
+            _table.Add(obj);
             Save();
         }
 
@@ -44,25 +49,47 @@ namespace LibraryManager.Managers.Main
         {
             if (obj != null)
             {
-                table.Attach(obj);
+                _table.Attach(obj);
                 _context.Entry(obj).State = EntityState.Modified;
                 Save();
             }
         }
-        
+
         // Delete Record
         public void Delete(T existing)
         {
-            table.Remove(existing);
+            _table.Remove(existing);
             Save();
         }
         
-        public List<SelectListItem> GetEntitiesSelectList(List<T> lists)
+        // Update DeleteDate In Table
+        public async Task Update_DeleteDate_ByIdAsync(object id)
         {
+            var entity = await _table.FindAsync(id);
+            if (entity != null)
+            {
+                entity.GetType().GetProperty("DeleteDate")?.SetValue(entity, DateTime.Now);
+                Update(entity);
+            }
+        }
+
+        public void Save()
+        {
+            _context.SaveChanges();
+        }
+        
+        ///////////////////////////////////////////////////////////////////////// 
+        
+        public List<SelectListItem> GetEntitiesSelectList(List<T> list = null)
+        {
+            
+            list ??= _table.ToList().Where(o => o.GetType().GetProperty("DeleteDate")?.GetValue(o) == null).ToList();
+
             List<SelectListItem> employeeSelectList = new List<SelectListItem>();
+            
             try
             {
-                foreach (var item in lists)
+                foreach (var item in list)
                 {
                     object obj = item;
                     var GetNameProperty = item.GetType().GetProperty("Name");
@@ -84,17 +111,6 @@ namespace LibraryManager.Managers.Main
             }
         }
         
-        // Update DeleteDate In Table
-        public async Task Update_DeleteDate_ByIdAsync(object id)
-        {
-            var entity = await table.FindAsync(id);
-            if (entity != null)
-            {
-                entity.GetType().GetProperty("DeleteDate")?.SetValue(entity,DateTime.Now);
-                Update(entity);
-            }
-        }
-        
         public List<SelectListItem> GetEmployeesSelectList()
         {
             List<SelectListItem> employeeSelectList = new List<SelectListItem>();
@@ -109,10 +125,9 @@ namespace LibraryManager.Managers.Main
 
             return employeeSelectList;
         }
+  
 
-        public void Save()
-        {
-            _context.SaveChanges();
-        }
+       
+  
     }
 }

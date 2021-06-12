@@ -4,15 +4,17 @@ using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
+using Database;
+using Microsoft.EntityFrameworkCore;
 
 namespace LibraryManager.Managers.Main
 {
-    public class Filter<T> : IFilter<T> where T : class
+    public class Filter<T> : ExpressionTree<T>, IFilter<T> where T : class
     {
-        private readonly IExpressionTree<T> _expressionTree;
-        public Filter(IExpressionTree<T> expressionTree)
+        private readonly DbSet<T> _table;
+        public Filter(LibraryManagerDBContext context)
         {
-            _expressionTree = expressionTree;
+            _table = context.Set<T>();
         }
         
         public IEnumerable<T> Intersect(params IEnumerable<T>[] lists)
@@ -36,7 +38,7 @@ namespace LibraryManager.Managers.Main
         }
         
    
-        public async Task<List<T>> FilterInBetweenDates(string dateStart,
+        public async Task<List<T>> FilterOfDate(string dateStart,
             string dateEnd, string propertyName, List<T> elements)
         {
             await Task.Run(() => { });
@@ -50,29 +52,28 @@ namespace LibraryManager.Managers.Main
                 DateTime start = DateTime.Parse(dateStart);
                 DateTime end = DateTime.Parse(dateEnd);
 
-                Func<T, bool> startDate = _expressionTree.GreatThan(start, propertyName).Compile();
-                Func<T, bool> endDate = _expressionTree.LessThan(end, propertyName).Compile();
+                Func<T, bool> startDate = GreatThan(start, propertyName).Compile();
+                Func<T, bool> endDate = LessThan(end, propertyName).Compile();
                 foreach (var item in elements)
                     if (startDate(item) && endDate(item))
                         entities.Add(item);
             }
-
             return entities;
         }
 
-        public async Task<List<T>> GetListByValue(object value, string PropertyName, List<T> Elements)
+        public async Task<List<T>> FilterOfEntititesByValue(object value, string PropertyName, List<T> Elements = null)
         {
+            Elements ??= _table.ToList();
             return await Task.Run(() =>
             {
                 List<T> entities = new List<T>();
                 if (value != null)
                 {
-                    Func<T, bool> check = _expressionTree.ExistOrNot(value, PropertyName).Compile();
+                    Func<T, bool> check = ExistOrNot(value, PropertyName).Compile();
                     foreach (var item in Elements)
                         if (check(item))
                             entities.Add(item);
                 }
-
                 return entities;
             });
         }

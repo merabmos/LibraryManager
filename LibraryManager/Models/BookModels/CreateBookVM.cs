@@ -14,7 +14,7 @@ namespace LibraryManager.Models.BookModels
         List<int> AuthorIds = new List<int>();
         public static List<int> GenreIds = new List<int>();
 
-
+        
         public int GenreId { get; set; }
         
         [Required]
